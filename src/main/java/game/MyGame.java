@@ -2,17 +2,18 @@ package game;
 
 import engine.core.GameLogic;
 import engine.input.Input;
+import engine.math.Matrix4f;
 import engine.render.Mesh;
 import engine.render.Renderer;
 import engine.render.ShaderProgram;
-
-
-import static org.lwjgl.glfw.GLFW.*;
 
 public class MyGame implements GameLogic {
     private Renderer renderer;
     private Mesh triangle;
     private ShaderProgram shader;
+    private Matrix4f transform;
+
+    private float x = 0f;
 
     @Override
     public void init() {
@@ -26,20 +27,20 @@ public class MyGame implements GameLogic {
         triangle = new Mesh(positions, 2);
 
         shader = new ShaderProgram("/shaders/triangle.vert", "/shaders/triangle.frag");
+
+        transform = new Matrix4f();
     }
 
     @Override
     public void update(double dt, Input input) {
-        /*
-        if (input.isKeyPressed(GLFW_KEY_SPACE)) {
-            System.out.println("You pressed SPACE");
-        }
-         */
+        x += dt * 0.5f;
+
+        transform.identity().translate(x, 0f, 0f).scale(0.5f);
     }
 
     @Override
     public void render() {
-        renderer.render(triangle, shader);
+        renderer.render(triangle, shader, transform);
     }
 
     @Override

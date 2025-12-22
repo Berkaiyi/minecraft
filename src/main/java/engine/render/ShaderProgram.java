@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
 import static org.lwjgl.opengl.GL20.*;
+import engine.math.Matrix4f;
+import java.nio.FloatBuffer;
 
 public class ShaderProgram {
     private final int programId;
@@ -30,6 +32,16 @@ public class ShaderProgram {
         glDetachShader(programId, fragmentId);
         glDeleteShader(vertexId);
         glDeleteShader(fragmentId);
+    }
+
+    public void setUniformMat4f(String name, Matrix4f mat) {
+        int location = glGetUniformLocation(programId, name);
+        if (location == -1) {
+            throw new RuntimeException("Uniform not found" + name);
+        }
+
+        FloatBuffer buffer = mat.toBuffer();
+        glUniformMatrix4fv(location, false, buffer);
     }
 
     private static String loadResource(String path) {
