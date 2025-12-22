@@ -5,7 +5,7 @@ import engine.core.GameLogic;
 public class MyGame implements GameLogic {
     @Override
     public void init() {
-        System.out.println("Spiel startet");
+        System.out.println("Game init");
     }
 
     @Override
@@ -20,6 +20,6 @@ public class MyGame implements GameLogic {
 
     @Override
     public void cleanup() {
-        System.out.println("Spiel endet");
+        System.out.println("Game cleanup");
     }
 }
