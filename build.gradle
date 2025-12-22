@@ -16,6 +16,10 @@ java {
 
 application {
     mainClass = 'launcher.Main'
+
+    if (OperatingSystem.current().isMacOsX()) {
+        applicationDefaultJvmArgs = ['-XstartOnFirstThread']
+    }
 }
 
 repositories {
