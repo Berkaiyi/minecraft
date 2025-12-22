@@ -34,6 +34,10 @@ public class Window {
         GL.createCapabilities();
     }
 
+    public long getHandle() {
+        return window;
+    }
+
     public void pollEvents() {
         GLFW.glfwPollEvents();
     }

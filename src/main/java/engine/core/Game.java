@@ -1,7 +1,8 @@
 package engine.core;
 
 import engine.window.Window;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
+import engine.input.Input;
+import static org.lwjgl.glfw.GLFW.*;
 
 public class Game {
     private static final int TARGET_FPS = 60;
@@ -10,15 +11,24 @@ public class Game {
     private final GameLogic logic;
     private Window window;
     private Timer timer;
+    private Input input;
 
     public Game(GameLogic logic) {
         this.logic = logic;
     }
 
     public void run() {
-        init();
-        loop();
-        cleanup();
+        try {
+            init();
+            loop();
+        }
+        catch (Throwable t) {
+            System.err.println("=== ENGINE CRASH ===");
+            t.printStackTrace();
+        }
+        finally {
+            cleanup();
+        }
     }
 
     private void init() {
@@ -26,6 +36,11 @@ public class Game {
         window.init();
 
         timer = new Timer();
+
+        input = new Input(window.getHandle());
+        input.registerKey(GLFW_KEY_ESCAPE);
+
+
         logic.init();
     }
 
@@ -37,13 +52,14 @@ public class Game {
             accumulator += delta;
 
             window.pollEvents();
+            input.update();
 
-            if (window.isKeyPressed(GLFW_KEY_ESCAPE)) {
+            if (input.isKeyPressed(GLFW_KEY_ESCAPE)) {
                 window.close();
             }
 
             while (accumulator >= TIME_PER_UPDATE) {
-                logic.update(TIME_PER_UPDATE);
+                logic.update(TIME_PER_UPDATE, input);
                 accumulator -= TIME_PER_UPDATE;
             }
 

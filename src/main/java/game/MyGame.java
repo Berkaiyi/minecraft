@@ -1,6 +1,9 @@
 package game;
 
 import engine.core.GameLogic;
+import engine.input.Input;
+
+import static org.lwjgl.glfw.GLFW.*;
 
 public class MyGame implements GameLogic {
     @Override
@@ -9,8 +12,12 @@ public class MyGame implements GameLogic {
     }
 
     @Override
-    public void update(double dt) {
-        // Spiellogik
+    public void update(double dt, Input input) {
+        /*
+        if (input.isKeyPressed(GLFW_KEY_SPACE)) {
+            System.out.println("You pressed SPACE");
+        }
+         */
     }
 
     @Override
