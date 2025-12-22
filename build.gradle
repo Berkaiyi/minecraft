@@ -18,7 +18,9 @@ application {
     mainClass = 'launcher.Main'
 
     if (OperatingSystem.current().isMacOsX()) {
-        applicationDefaultJvmArgs = ['-XstartOnFirstThread']
+        applicationDefaultJvmArgs = [
+                '-XstartOnFirstThread',
+                '--enable-native-access=ALL-UNNAMED']
     }
 }
 
