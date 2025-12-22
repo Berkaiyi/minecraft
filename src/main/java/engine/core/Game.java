@@ -63,8 +63,8 @@ public class Game {
                 accumulator -= TIME_PER_UPDATE;
             }
 
-            logic.render();
             window.clear();
+            logic.render();
             window.swapBuffers();
         }
     }

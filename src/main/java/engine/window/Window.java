@@ -4,6 +4,8 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 
+import static org.lwjgl.opengl.GL11.*;
+
 public class Window {
     private long window;
     private final String title;
@@ -32,6 +34,7 @@ public class Window {
         GLFW.glfwShowWindow(window);
 
         GL.createCapabilities();
+        glViewport(0, 0, width, height);
     }
 
     public long getHandle() {
