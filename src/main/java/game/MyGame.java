@@ -1,6 +1,7 @@
 package game;
 
 import engine.core.GameLogic;
+import engine.input.Action;
 import engine.input.Input;
 import org.joml.Matrix4f;
 import engine.render.Mesh;
@@ -9,8 +10,6 @@ import engine.render.ShaderProgram;
 import engine.scene.Camera;
 import engine.world.Block;
 import engine.world.BlockType;
-
-import static org.lwjgl.glfw.GLFW.*;
 
 public class MyGame implements GameLogic {
     private static final float[] CUBE_VERTICES = {
@@ -64,8 +63,6 @@ public class MyGame implements GameLogic {
     private static final float MOUSE_SENS = 0.1f;
     private static final float MOVE_SPEED = 3.0f;
 
-    private float rotationTime = 0f;
-
     @Override
     public void init() {
         renderer = new Renderer();
@@ -96,12 +93,12 @@ public class MyGame implements GameLogic {
 
         float v = (float) dt * MOVE_SPEED;
 
-        if (input.isKeyDown(GLFW_KEY_W))            { camera.addMoveForward(); }
-        if (input.isKeyDown(GLFW_KEY_S))            { camera.addMoveBackward(); }
-        if (input.isKeyDown(GLFW_KEY_D))            { camera.addMoveRight(); }
-        if (input.isKeyDown(GLFW_KEY_A))            { camera.addMoveLeft(); }
-        if (input.isKeyDown(GLFW_KEY_SPACE))        { camera.addMoveUp(); }
-        if (input.isKeyDown(GLFW_KEY_LEFT_SHIFT))   { camera.addMoveDown(); }
+        if (input.isActionDown(Action.MOVE_FORWARD))    { camera.addMoveForward(); }
+        if (input.isActionDown(Action.MOVE_BACKWARD))   { camera.addMoveBackward(); }
+        if (input.isActionDown(Action.MOVE_RIGHT))      { camera.addMoveRight(); }
+        if (input.isActionDown(Action.MOVE_LEFT))       { camera.addMoveLeft(); }
+        if (input.isActionDown(Action.MOVE_UP))         { camera.addMoveUp(); }
+        if (input.isActionDown(Action.MOVE_DOWN))       { camera.addMoveDown(); }
 
         camera.move(v);
     }

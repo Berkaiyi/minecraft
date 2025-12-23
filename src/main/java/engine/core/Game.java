@@ -1,5 +1,6 @@
 package engine.core;
 
+import engine.input.Action;
 import engine.window.Window;
 import engine.input.Input;
 import static org.lwjgl.glfw.GLFW.*;
@@ -41,15 +42,13 @@ public class Game {
         timer = new Timer();
         input = new Input(window.getHandle());
 
-        input.registerKey(GLFW_KEY_ESCAPE);
-        input.registerKey(GLFW_KEY_W);
-        input.registerKey(GLFW_KEY_A);
-        input.registerKey(GLFW_KEY_S);
-        input.registerKey(GLFW_KEY_D);
-        input.registerKey(GLFW_KEY_SPACE);
-        input.registerKey(GLFW_KEY_LEFT_SHIFT);
-
-
+        input.bind(Action.EXIT, GLFW_KEY_ESCAPE);
+        input.bind(Action.MOVE_FORWARD, GLFW_KEY_W);
+        input.bind(Action.MOVE_LEFT, GLFW_KEY_A);
+        input.bind(Action.MOVE_BACKWARD, GLFW_KEY_S);
+        input.bind(Action.MOVE_RIGHT, GLFW_KEY_D);
+        input.bind(Action.MOVE_UP, GLFW_KEY_SPACE);
+        input.bind(Action.MOVE_DOWN, GLFW_KEY_LEFT_SHIFT);
 
         logic.init();
     }
@@ -64,7 +63,7 @@ public class Game {
             window.pollEvents();
 
             // INPUT -----------
-            if (input.isKeyPressed(GLFW_KEY_ESCAPE)) {
+            if (input.isActionDown(Action.EXIT)) {
                 window.close();
             }
             // -----------

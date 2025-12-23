@@ -9,6 +9,7 @@ import java.util.Map;
 
 public class Input {
     private final long windowHandle;
+    private final Map<Action, Integer> bindings = new HashMap<>();
     private final Map<Integer, KeyState> keys = new HashMap<>();
 
     private GLFWCursorPosCallback cursorCallback;
@@ -49,7 +50,6 @@ public class Input {
 
     public void update() {
         for (int key : keys.keySet()) {
-            boolean isDown = GLFW.glfwGetKey(windowHandle, key) == GLFW.GLFW_PRESS;
             KeyState state = keys.get(key);
 
             if (state == KeyState.PRESSED) {
@@ -59,6 +59,16 @@ public class Input {
                 keys.put(key, KeyState.UP);
             }
         }
+    }
+
+    public void bind(Action action, int glfwKey) {
+        bindings.put(action, glfwKey);
+        registerKey(glfwKey);
+    }
+
+    public boolean isActionDown(Action action) {
+        Integer key = bindings.get(action);
+        return (key != null) && (isKeyDown(key));
     }
 
     public void registerKey(int key) {
