@@ -44,6 +44,8 @@ public class Window {
         GLFW.glfwSwapInterval(1);
         GLFW.glfwShowWindow(window);
 
+        GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
         GL.createCapabilities();
 
         glEnable(GL_DEPTH_TEST);

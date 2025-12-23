@@ -8,25 +8,18 @@ import engine.render.Renderer;
 import engine.render.ShaderProgram;
 import engine.scene.Camera;
 
+import static org.lwjgl.glfw.GLFW.*;
+
 public class MyGame implements GameLogic {
     private static final float[] CUBE_VERTICES = {
-            // 0
-            -0.5f, -0.5f, -0.5f,
-            // 1
-            0.5f, -0.5f, -0.5f,
-            // 2
-            0.5f,  0.5f, -0.5f,
-            // 3
-            -0.5f,  0.5f, -0.5f,
-
-            // 4
-            -0.5f, -0.5f,  0.5f,
-            // 5
-            0.5f, -0.5f,  0.5f,
-            // 6
-            0.5f,  0.5f,  0.5f,
-            // 7
-            -0.5f,  0.5f,  0.5f
+            -0.5f, -0.5f, -0.5f,    0, 0, 1,   1, 0, 0,
+             0.5f, -0.5f, -0.5f,    0, 0, 1,   1, 0, 0,
+             0.5f,  0.5f, -0.5f,    0, 0, 1,   1, 0, 0,
+            -0.5f,  0.5f, -0.5f,    0, 0, 1,   1, 0, 0,
+            -0.5f, -0.5f,  0.5f,    0, 0, 1,   1, 0, 0,
+             0.5f, -0.5f,  0.5f,    0, 0, 1,   1, 0, 0,
+             0.5f,  0.5f,  0.5f,    0, 0, 1,   1, 0, 0,
+            -0.5f,  0.5f,  0.5f,    0, 0, 1,   1, 0, 0
     };
     private static final int[] CUBE_INDICES = {
             // Front (z = +0.5)  4,5,6,7
@@ -63,15 +56,18 @@ public class MyGame implements GameLogic {
     private Matrix4f model;
     private Matrix4f projection;
 
-    private float rotation = 0f;
+    private static final float MOUSE_SENS = 0.1f;
+    private static final float MOVE_SPEED = 3.0f;
+
+    private float rotationTime = 0f;
 
     @Override
     public void init() {
         renderer = new Renderer();
 
-        cube = new Mesh(CUBE_VERTICES, 3, CUBE_INDICES);
+        cube = new Mesh(CUBE_VERTICES, CUBE_INDICES);
 
-        shader = new ShaderProgram("/shaders/basic.vert", "/shaders/basic.frag");
+        shader = new ShaderProgram("/shaders/light.vert", "/shaders/light.frag");
 
         camera = new Camera();
         model = new Matrix4f();
@@ -81,10 +77,37 @@ public class MyGame implements GameLogic {
 
     @Override
     public void update(double dt, Input input) {
-        rotation += dt;
+        float dx = (float) input.consumeMouseDeltaX();
+        float dy = (float) input.consumeMouseDeltaY();
 
-        Matrix4f rotX = Matrix4f.rotationX(rotation);
-        Matrix4f rotY = Matrix4f.rotationY(rotation);
+        camera.addYawPitch(dx * MOUSE_SENS, -dy * MOUSE_SENS);
+
+        float v = (float) dt * MOVE_SPEED;
+
+        if (input.isKeyDown(GLFW_KEY_W)) {
+            camera.move(camera.getForward().mul(v));
+        }
+        if (input.isKeyDown(GLFW_KEY_S)) {
+            camera.move(camera.getForward().mul(-v));
+        }
+        if (input.isKeyDown(GLFW_KEY_D)) {
+            camera.move(camera.getRight().mul(v));
+        }
+        if (input.isKeyDown(GLFW_KEY_A)) {
+            camera.move(camera.getRight().mul(-v));
+        }
+
+        if (input.isKeyDown(GLFW_KEY_SPACE)) {
+            camera.move(camera.getUp().mul(v));
+        }
+        if (input.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
+            camera.move(camera.getUp().mul(-v));
+        }
+
+        rotationTime += dt;
+
+        Matrix4f rotX = Matrix4f.rotationX(rotationTime);
+        Matrix4f rotY = Matrix4f.rotationY(rotationTime);
 
         model = rotX.mul(rotY);
     }

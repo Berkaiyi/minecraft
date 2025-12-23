@@ -15,7 +15,10 @@ public class Mesh {
     private final int eboId;
     private final int indexCount;
 
-    public Mesh(float[] positions, int posSize, int[] indices) {
+    private static final int FLOAT_SIZE = 4;
+    private static final int STRIDE = 9 * FLOAT_SIZE;
+
+    public Mesh(float[] vertices, int[] indices) {
         indexCount = indices.length;
 
         vaoId = glGenVertexArrays();
@@ -24,13 +27,20 @@ public class Mesh {
         vboId = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vboId);
 
-        FloatBuffer vbuf = MemoryUtil.memAllocFloat(positions.length);
-        vbuf.put(positions).flip();
+        FloatBuffer vbuf = MemoryUtil.memAllocFloat(vertices.length);
+        vbuf.put(vertices).flip();
         glBufferData(GL_ARRAY_BUFFER, vbuf, GL_STATIC_DRAW);
         MemoryUtil.memFree(vbuf);
 
-        glVertexAttribPointer(0, posSize, GL_FLOAT, false, 0, 0);
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, STRIDE, 0);
         glEnableVertexAttribArray(0);
+
+        glVertexAttribPointer(1, 3, GL_FLOAT, false, STRIDE, 3 * FLOAT_SIZE);
+        glEnableVertexAttribArray(1);
+
+        glVertexAttribPointer(2, 3, GL_FLOAT, false, STRIDE, 6 * FLOAT_SIZE);
+        glEnableVertexAttribArray(2);
 
 
         eboId = glGenBuffers();

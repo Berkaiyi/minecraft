@@ -5,8 +5,11 @@ import engine.input.Input;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class Game {
-    private static final int TARGET_FPS = 60;
-    private static final double TIME_PER_UPDATE = 1.0 / TARGET_FPS;
+    private static final int TARGET_UPS = 60;
+    private static final double TIME_PER_UPDATE = 1.0 / TARGET_UPS;
+
+    private int fps;
+    private int ups;
 
     private final GameLogic logic;
     private Window window;
@@ -39,6 +42,13 @@ public class Game {
 
         input = new Input(window.getHandle());
         input.registerKey(GLFW_KEY_ESCAPE);
+        input.registerKey(GLFW_KEY_W);
+        input.registerKey(GLFW_KEY_A);
+        input.registerKey(GLFW_KEY_S);
+        input.registerKey(GLFW_KEY_D);
+        input.registerKey(GLFW_KEY_SPACE);
+        input.registerKey(GLFW_KEY_LEFT_SHIFT);
+
 
 
         logic.init();
@@ -60,12 +70,20 @@ public class Game {
 
             while (accumulator >= TIME_PER_UPDATE) {
                 logic.update(TIME_PER_UPDATE, input);
+                ups++;
                 accumulator -= TIME_PER_UPDATE;
             }
 
             window.clear();
             logic.render();
             window.swapBuffers();
+            fps++;
+
+            if (timer.hasSecondPassed(delta)) {
+                System.out.println("FPS: " + fps + " | UPS: " + ups);
+                fps = 0;
+                ups = 0;
+            }
         }
     }
 

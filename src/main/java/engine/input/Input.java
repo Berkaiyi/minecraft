@@ -8,8 +8,27 @@ public class Input {
     private final long windowHandle;
     private final Map<Integer, KeyState> keys = new HashMap<>();
 
+    private double mouseX, mouseY;
+    private double lastMouseX, lastMouseY;
+    private double deltaX, deltaY;
+    private boolean firstMouse = true;
+
     public Input(long windowHandle) {
         this.windowHandle = windowHandle;
+
+        GLFW.glfwSetCursorPosCallback(windowHandle, (win, x, y) -> {
+            mouseX = x;
+            mouseY = y;
+            if (firstMouse) {
+                lastMouseX = x;
+                lastMouseY = y;
+                firstMouse = false;
+            }
+            deltaX = mouseX - lastMouseX;
+            deltaY = mouseY - lastMouseY;
+            lastMouseX = mouseX;
+            lastMouseY = mouseY;
+        });
     }
 
     public void update() {
@@ -44,5 +63,23 @@ public class Input {
 
     public boolean isKeyReleased(int key) {
         return keys.get(key) == KeyState.RELEASED;
+    }
+
+    public double consumeMouseDeltaX() {
+        double dx = deltaX;
+        deltaX = 0;
+        return dx;
+    }
+
+    public double consumeMouseDeltaY() {
+        double dy = deltaY;
+        deltaY = 0;
+        return dy;
+    }
+
+    public void resetMouse() {
+        firstMouse = true;
+        deltaX = 0;
+        deltaY = 0;
     }
 }

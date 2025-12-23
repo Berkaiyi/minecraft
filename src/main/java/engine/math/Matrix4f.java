@@ -1,5 +1,7 @@
 package engine.math;
 
+import engine.math.Vector3f;
+
 import java.nio.FloatBuffer;
 import org.lwjgl.system.MemoryUtil;
 
@@ -24,11 +26,32 @@ public class Matrix4f {
         return m;
     }
 
-    public static Matrix4f lookAt(Vector3f pos, Vector3f target) {
-        Vector3f forward = pos.sub(target);
+    public static Matrix4f lookAt(Vector3f pos, Vector3f forward, Vector3f up) {
+        Vector3f f = forward.normalize();
+
+        float sx = f.y * up.z - f.z * up.y;
+        float sy = f.z * up.x - f.x * up.z;
+        float sz = f.x * up.y - f.y * up.x;
+        Vector3f s = new engine.math.Vector3f(sx, sy, sz).normalize();
+
+        float ux = s.y * f.z - s.z * f.y;
+        float uy = s.z * f.x - s.x * f.z;
+        float uz = s.x * f.y - s.y * f.x;
+        Vector3f u = new engine.math.Vector3f(ux, uy, uz);
 
         Matrix4f m = new Matrix4f();
-        m.translate(-pos.x, -pos.y, -pos.z);
+        m.identity();
+
+        // column-major
+        m.m[0] = s.x; m.m[4] = s.y; m.m[8]  = s.z;
+        m.m[1] = u.x; m.m[5] = u.y; m.m[9]  = u.z;
+        m.m[2] = -f.x; m.m[6] = -f.y; m.m[10] = -f.z;
+
+        // translation
+        m.m[12] = -(s.x * pos.x + s.y * pos.y + s.z * pos.z);
+        m.m[13] = -(u.x * pos.x + u.y * pos.y + u.z * pos.z);
+        m.m[14] =  (f.x * pos.x + f.y * pos.y + f.z * pos.z);
+
         return m;
     }
 
