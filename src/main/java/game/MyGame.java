@@ -10,57 +10,53 @@ import engine.scene.Camera;
 
 public class MyGame implements GameLogic {
     private static final float[] CUBE_VERTICES = {
-            // Front
-            -0.5f, -0.5f,  0.5f,
-            0.5f, -0.5f,  0.5f,
-            0.5f,  0.5f,  0.5f,
-            0.5f,  0.5f,  0.5f,
-            -0.5f,  0.5f,  0.5f,
-            -0.5f, -0.5f,  0.5f,
-
-            // Back
-            0.5f, -0.5f, -0.5f,
+            // 0
             -0.5f, -0.5f, -0.5f,
-            -0.5f,  0.5f, -0.5f,
-            -0.5f,  0.5f, -0.5f,
-            0.5f,  0.5f, -0.5f,
+            // 1
             0.5f, -0.5f, -0.5f,
+            // 2
+            0.5f,  0.5f, -0.5f,
+            // 3
+            -0.5f,  0.5f, -0.5f,
 
-            // Left
-            -0.5f, -0.5f, -0.5f,
+            // 4
             -0.5f, -0.5f,  0.5f,
-            -0.5f,  0.5f,  0.5f,
-            -0.5f,  0.5f,  0.5f,
-            -0.5f,  0.5f, -0.5f,
-            -0.5f, -0.5f, -0.5f,
-
-            // Right
+            // 5
             0.5f, -0.5f,  0.5f,
-            0.5f, -0.5f, -0.5f,
-            0.5f,  0.5f, -0.5f,
-            0.5f,  0.5f, -0.5f,
+            // 6
             0.5f,  0.5f,  0.5f,
-            0.5f, -0.5f,  0.5f,
+            // 7
+            -0.5f,  0.5f,  0.5f
+    };
+    private static final int[] CUBE_INDICES = {
+            // Front (z = +0.5)  4,5,6,7
+            4, 5, 6,
+            6, 7, 4,
 
-            // Top
-            -0.5f,  0.5f,  0.5f,
-            0.5f,  0.5f,  0.5f,
-            0.5f,  0.5f, -0.5f,
-            0.5f,  0.5f, -0.5f,
-            -0.5f,  0.5f, -0.5f,
-            -0.5f,  0.5f,  0.5f,
+            // Back (z = -0.5)   0,1,2,3
+            1, 0, 3,
+            3, 2, 1,
 
-            // Bottom
-            -0.5f, -0.5f, -0.5f,
-            0.5f, -0.5f, -0.5f,
-            0.5f, -0.5f,  0.5f,
-            0.5f, -0.5f,  0.5f,
-            -0.5f, -0.5f,  0.5f,
-            -0.5f, -0.5f, -0.5f
+            // Left (x = -0.5)   0,4,7,3
+            0, 4, 7,
+            7, 3, 0,
+
+            // Right (x = +0.5)  5,1,2,6
+            5, 1, 2,
+            2, 6, 5,
+
+            // Top (y = +0.5)    3,7,6,2
+            3, 7, 6,
+            6, 2, 3,
+
+            // Bottom (y = -0.5) 0,1,5,4
+            0, 1, 5,
+            5, 4, 0
     };
 
+
     private Renderer renderer;
-    private Mesh triangle;
+    private Mesh cube;
     private ShaderProgram shader;
     private Camera camera;
 
@@ -73,7 +69,7 @@ public class MyGame implements GameLogic {
     public void init() {
         renderer = new Renderer();
 
-        triangle = new Mesh(CUBE_VERTICES, 3);
+        cube = new Mesh(CUBE_VERTICES, 3, CUBE_INDICES);
 
         shader = new ShaderProgram("/shaders/basic.vert", "/shaders/basic.frag");
 
@@ -95,12 +91,12 @@ public class MyGame implements GameLogic {
 
     @Override
     public void render() {
-        renderer.render(triangle, shader, model, camera.getViewMatrix(), projection);
+        renderer.render(cube, shader, model, camera.getViewMatrix(), projection);
     }
 
     @Override
     public void cleanup() {
-        if (triangle != null) { triangle.cleanup(); }
+        if (cube != null) { cube.cleanup(); }
         if (shader != null) { shader.cleanup(); }
     }
 }
