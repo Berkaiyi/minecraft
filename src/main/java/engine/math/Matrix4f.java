@@ -10,6 +10,28 @@ public class Matrix4f {
         identity();
     }
 
+    public static Matrix4f perspective(float fov, float aspect, float near, float far) {
+        Matrix4f m = new Matrix4f();
+        float tan = (float) Math.tan(Math.toRadians(fov / 2f));
+
+        m.m[0] = 1f / (aspect * tan);
+        m.m[5] = 1f / tan;
+        m.m[10] = -(far + near) / (far - near);
+        m.m[11] = -1f;
+        m.m[14] = -(2f * far * near) / (far - near);
+        m.m[15] = 0f;
+
+        return m;
+    }
+
+    public static Matrix4f lookAt(Vector3f pos, Vector3f target) {
+        Vector3f forward = pos.sub(target);
+
+        Matrix4f m = new Matrix4f();
+        m.translate(-pos.x, -pos.y, -pos.z);
+        return m;
+    }
+
     public Matrix4f identity() {
         for (int i = 0; i < 16; i++) {
             m[i] = 0f;
@@ -32,6 +54,84 @@ public class Matrix4f {
         m[0] *= s;
         m[5] *= s;
         m[10] *= s;
+        return this;
+    }
+
+    public static Matrix4f rotationX(float angleRad) {
+        Matrix4f m = new Matrix4f();
+
+        float cos = (float) Math.cos(angleRad);
+        float sin = (float) Math.sin(angleRad);
+
+        m.m[5] = cos;
+        m.m[6] = sin;
+        m.m[9] = -sin;
+        m.m[10] = cos;
+
+        return m;
+    }
+
+    public static Matrix4f rotationY(float angleRad) {
+        Matrix4f m = new Matrix4f();
+
+        float cos = (float) Math.cos(angleRad);
+        float sin = (float) Math.sin(angleRad);
+
+        m.m[0] = cos;
+        m.m[2] = -sin;
+        m.m[8] = sin;
+        m.m[10] = cos;
+
+        return m;
+    }
+
+    public Matrix4f mul(Matrix4f o) {
+        Matrix4f r = new Matrix4f();
+
+        for (int row = 0; row < 4; row++) {
+            for (int col = 0; col < 4; col++) {
+                r.m[col * 4 + row] =
+                        m[0 * 4 + row] * o.m[col * 4 + 0] +
+                        m[1 * 4 + row] * o.m[col * 4 + 1] +
+                        m[2 * 4 + row] * o.m[col * 4 + 2] +
+                        m[3 * 4 + row] * o.m[col * 4 + 3];
+            }
+        }
+
+        return r;
+    }
+
+    public Matrix4f rotateX(float angleRad) {
+        float cos = (float) Math.cos(angleRad);
+        float sin = (float) Math.sin(angleRad);
+
+        float m5 = m[5] * cos + m[9] * sin;
+        float m6 = m[6] * cos + m[10] * sin;
+        float m9 = m[9] * cos - m[5] * sin;
+        float m10 = m[10] * cos - m[6] * sin;
+
+        m[5] = m5;
+        m[6] = m6;
+        m[9] = m9;
+        m[10] = m10;
+
+        return this;
+    }
+
+    public Matrix4f rotateY(float angleRad) {
+        float cos = (float) Math.cos(angleRad);
+        float sin = (float) Math.sin(angleRad);
+
+        float m0 = m[0] * cos + m[8] * sin;
+        float m2 = m[2] * cos + m[10] * sin;
+        float m8 = m[8] * cos - m[0] * sin;
+        float m10 = m[10] * cos - m[2] * sin;
+
+        m[0] = m0;
+        m[2] = m2;
+        m[8] = m8;
+        m[10] = m10;
+
         return this;
     }
 

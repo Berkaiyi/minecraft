@@ -6,41 +6,96 @@ import engine.math.Matrix4f;
 import engine.render.Mesh;
 import engine.render.Renderer;
 import engine.render.ShaderProgram;
+import engine.scene.Camera;
 
 public class MyGame implements GameLogic {
+    private static final float[] CUBE_VERTICES = {
+            // Front
+            -0.5f, -0.5f,  0.5f,
+            0.5f, -0.5f,  0.5f,
+            0.5f,  0.5f,  0.5f,
+            0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f,  0.5f,
+            -0.5f, -0.5f,  0.5f,
+
+            // Back
+            0.5f, -0.5f, -0.5f,
+            -0.5f, -0.5f, -0.5f,
+            -0.5f,  0.5f, -0.5f,
+            -0.5f,  0.5f, -0.5f,
+            0.5f,  0.5f, -0.5f,
+            0.5f, -0.5f, -0.5f,
+
+            // Left
+            -0.5f, -0.5f, -0.5f,
+            -0.5f, -0.5f,  0.5f,
+            -0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f, -0.5f,
+            -0.5f, -0.5f, -0.5f,
+
+            // Right
+            0.5f, -0.5f,  0.5f,
+            0.5f, -0.5f, -0.5f,
+            0.5f,  0.5f, -0.5f,
+            0.5f,  0.5f, -0.5f,
+            0.5f,  0.5f,  0.5f,
+            0.5f, -0.5f,  0.5f,
+
+            // Top
+            -0.5f,  0.5f,  0.5f,
+            0.5f,  0.5f,  0.5f,
+            0.5f,  0.5f, -0.5f,
+            0.5f,  0.5f, -0.5f,
+            -0.5f,  0.5f, -0.5f,
+            -0.5f,  0.5f,  0.5f,
+
+            // Bottom
+            -0.5f, -0.5f, -0.5f,
+            0.5f, -0.5f, -0.5f,
+            0.5f, -0.5f,  0.5f,
+            0.5f, -0.5f,  0.5f,
+            -0.5f, -0.5f,  0.5f,
+            -0.5f, -0.5f, -0.5f
+    };
+
     private Renderer renderer;
     private Mesh triangle;
     private ShaderProgram shader;
-    private Matrix4f transform;
+    private Camera camera;
 
-    private float x = 0f;
+    private Matrix4f model;
+    private Matrix4f projection;
+
+    private float rotation = 0f;
 
     @Override
     public void init() {
         renderer = new Renderer();
 
-        float[] positions = {
-                -0.5f, -0.5f,
-                 0.5f, -0.5f,
-                 0.0f,  0.5f
-        };
-        triangle = new Mesh(positions, 2);
+        triangle = new Mesh(CUBE_VERTICES, 3);
 
-        shader = new ShaderProgram("/shaders/triangle.vert", "/shaders/triangle.frag");
+        shader = new ShaderProgram("/shaders/basic.vert", "/shaders/basic.frag");
 
-        transform = new Matrix4f();
+        camera = new Camera();
+        model = new Matrix4f();
+
+        projection = Matrix4f.perspective(70f, 1280f / 720f, 0.1f, 100f);
     }
 
     @Override
     public void update(double dt, Input input) {
-        x += dt * 0.5f;
+        rotation += dt;
 
-        transform.identity().translate(x, 0f, 0f).scale(0.5f);
+        Matrix4f rotX = Matrix4f.rotationX(rotation);
+        Matrix4f rotY = Matrix4f.rotationY(rotation);
+
+        model = rotX.mul(rotY);
     }
 
     @Override
     public void render() {
-        renderer.render(triangle, shader, transform);
+        renderer.render(triangle, shader, model, camera.getViewMatrix(), projection);
     }
 
     @Override

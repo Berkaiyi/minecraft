@@ -45,6 +45,10 @@ public class Window {
         GLFW.glfwShowWindow(window);
 
         GL.createCapabilities();
+
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
+
         try (MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer fbW = stack.mallocInt(1);
             IntBuffer fbH = stack.mallocInt(1);
@@ -66,7 +70,7 @@ public class Window {
 
     public void clear() {
         GL11.glClearColor(0f, 0f, 0f, 0f);
-        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
+        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
     public void swapBuffers() {

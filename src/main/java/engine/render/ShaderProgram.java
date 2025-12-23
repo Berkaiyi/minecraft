@@ -35,13 +35,12 @@ public class ShaderProgram {
     }
 
     public void setUniformMat4f(String name, Matrix4f mat) {
-        int location = glGetUniformLocation(programId, name);
-        if (location == -1) {
+        int loc = glGetUniformLocation(programId, name);
+        if (loc == -1) {
             throw new RuntimeException("Uniform not found" + name);
         }
 
-        FloatBuffer buffer = mat.toBuffer();
-        glUniformMatrix4fv(location, false, buffer);
+        glUniformMatrix4fv(loc, false, mat.toBuffer());
     }
 
     private static String loadResource(String path) {
