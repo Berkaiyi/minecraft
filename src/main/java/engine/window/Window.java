@@ -1,50 +1,72 @@
 package engine.window;
 
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 
 import java.nio.IntBuffer;
 import org.lwjgl.system.MemoryStack;
+import org.lwjgl.system.MemoryUtil;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.glfw.GLFW.*;
 
 public class Window {
     private long window;
     private final String title;
-    private final int width, height;
+    private int width, height;
+    private int fbWidth, fbHeight;
+    private boolean maximised, resize, vSync;
     private GLFWFramebufferSizeCallback fbCallback;
 
-    public Window(String title, int width, int height) {
+    public Window(String title, int width, int height, boolean vSync) {
         this.title = title;
         this.width = width;
         this.height = height;
+        this.vSync = vSync;
     }
 
     public void init() {
+        GLFWErrorCallback.createPrint(System.err).set();
+
         if (!GLFW.glfwInit()) {
             throw new IllegalStateException("GLFW init failed");
         }
 
+        GLFW.glfwDefaultWindowHints();
         GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 3);
         GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 3);
         GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE);
         GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_FORWARD_COMPAT, GLFW.GLFW_TRUE);
-
         GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GLFW.GLFW_FALSE);
+        GLFW.glfwWindowHint(GLFW.GLFW_RESIZABLE, GLFW.GLFW_TRUE);
 
-        window = GLFW.glfwCreateWindow(width, height, title, 0, 0);
-        if (window == 0) {
+        maximised = false;
+        if (width == 0 || height == 0) {
+            width = 100;
+            height = 100;
+            GLFW.glfwWindowHint(GLFW.GLFW_MAXIMIZED, GLFW.GLFW_TRUE);
+            maximised = true;
+        }
+
+        window = GLFW.glfwCreateWindow(width, height, title, MemoryUtil.NULL, MemoryUtil.NULL);
+        if (window == MemoryUtil.NULL) {
             throw new RuntimeException("Couldn't create window");
         }
+
+        fbCallback = GLFW.glfwSetFramebufferSizeCallback(window, (win, fbWidth, fbHeight) -> {
+            this.fbWidth = fbWidth;
+            this.fbHeight = fbHeight;
+            setResize(true);
+            glViewport(0, 0, this.fbWidth, this.fbHeight);
+        });
 
         GLFW.glfwMakeContextCurrent(window);
         GLFW.glfwSwapInterval(1);
         GLFW.glfwShowWindow(window);
 
-        GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
 
         GL.createCapabilities();
 
@@ -54,43 +76,25 @@ public class Window {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer fbW = stack.mallocInt(1);
             IntBuffer fbH = stack.mallocInt(1);
-            glfwGetFramebufferSize(window, fbW, fbH);
-            glViewport(0, 0, fbW.get(0), fbH.get(0));
-        }
-        fbCallback = glfwSetFramebufferSizeCallback(window, (win, fbWidth, fbHeight) -> {
+            GLFW.glfwGetFramebufferSize(window, fbW, fbH);
+            fbWidth = fbW.get(0);
+            fbHeight = fbH.get(0);
             glViewport(0, 0, fbWidth, fbHeight);
-        });
+        }
     }
 
-    public long getHandle() {
-        return window;
-    }
-
-    public void pollEvents() {
-        GLFW.glfwPollEvents();
-    }
-
+    public boolean isResize() { return resize; }
+    public void setResize(boolean resize) { this.resize = resize; }
+    public long getHandle() { return window; }
+    public void pollEvents() { GLFW.glfwPollEvents(); }
     public void clear() {
         GL11.glClearColor(0f, 0f, 0f, 0f);
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    public void swapBuffers() {
-        GLFW.glfwSwapBuffers(window);
-    }
-
-    public boolean shouldClose() {
-        return GLFW.glfwWindowShouldClose(window);
-    }
-
-    public boolean isKeyPressed(int key) {
-        return GLFW.glfwGetKey(window, key) == GLFW.GLFW_PRESS;
-    }
-
-    public void close() {
-        GLFW.glfwSetWindowShouldClose(window, true);
-    }
-
+    public void swapBuffers() { GLFW.glfwSwapBuffers(window); }
+    public boolean shouldClose() { return GLFW.glfwWindowShouldClose(window); }
+    public void close() { GLFW.glfwSetWindowShouldClose(window, true); }
     public void destroy() {
         if (fbCallback != null) { fbCallback.free(); }
         GLFW.glfwDestroyWindow(window);

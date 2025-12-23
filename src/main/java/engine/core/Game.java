@@ -35,7 +35,7 @@ public class Game {
     }
 
     private void init() {
-        window = new Window("LWJGL Engine", 1280, 720);
+        window = new Window("LWJGL Engine", 1280, 720, true);
         window.init();
 
         timer = new Timer();
@@ -62,11 +62,14 @@ public class Game {
             accumulator += delta;
 
             window.pollEvents();
-            input.update();
 
+            // INPUT -----------
             if (input.isKeyPressed(GLFW_KEY_ESCAPE)) {
                 window.close();
             }
+            // -----------
+
+            input.update();
 
             while (accumulator >= TIME_PER_UPDATE) {
                 logic.update(TIME_PER_UPDATE, input);
@@ -88,6 +91,7 @@ public class Game {
     }
 
     private void cleanup() {
+        input.cleanup();
         logic.cleanup();
         window.destroy();
     }

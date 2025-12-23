@@ -1,12 +1,18 @@
 package engine.input;
 
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.GLFWCursorPosCallback;
+import org.lwjgl.glfw.GLFWKeyCallback;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class Input {
     private final long windowHandle;
     private final Map<Integer, KeyState> keys = new HashMap<>();
+
+    private GLFWCursorPosCallback cursorCallback;
+    private GLFWKeyCallback keyCallback;
 
     private double mouseX, mouseY;
     private double lastMouseX, lastMouseY;
@@ -16,7 +22,17 @@ public class Input {
     public Input(long windowHandle) {
         this.windowHandle = windowHandle;
 
-        GLFW.glfwSetCursorPosCallback(windowHandle, (win, x, y) -> {
+        keyCallback = GLFW.glfwSetKeyCallback(windowHandle, (win, key, scancode, action, mods) -> {
+            if (!keys.containsKey(key)) return;
+            if (action == GLFW.GLFW_PRESS) {
+                keys.put(key, KeyState.PRESSED);
+            }
+            else if (action == GLFW.GLFW_RELEASE) {
+                keys.put(key, KeyState.RELEASED);
+            }
+        });
+
+        cursorCallback = GLFW.glfwSetCursorPosCallback(windowHandle, (win, x, y) -> {
             mouseX = x;
             mouseY = y;
             if (firstMouse) {
@@ -36,11 +52,11 @@ public class Input {
             boolean isDown = GLFW.glfwGetKey(windowHandle, key) == GLFW.GLFW_PRESS;
             KeyState state = keys.get(key);
 
-            if (isDown) {
-                keys.put(key, state == KeyState.UP ? KeyState.PRESSED : KeyState.DOWN);
+            if (state == KeyState.PRESSED) {
+                keys.put(key, KeyState.DOWN);
             }
-            else {
-                keys.put(key, state == KeyState.DOWN ? KeyState.RELEASED : KeyState.UP);
+            else if (state == KeyState.RELEASED) {
+                keys.put(key, KeyState.UP);
             }
         }
     }
@@ -81,5 +97,10 @@ public class Input {
         firstMouse = true;
         deltaX = 0;
         deltaY = 0;
+    }
+
+    public void cleanup() {
+        if (cursorCallback != null) { cursorCallback.free(); }
+        if (keyCallback != null) { keyCallback.free(); }
     }
 }
