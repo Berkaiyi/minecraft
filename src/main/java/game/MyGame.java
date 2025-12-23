@@ -7,10 +7,9 @@ import engine.render.Mesh;
 import engine.render.Renderer;
 import engine.render.ShaderProgram;
 import engine.scene.Camera;
+import engine.world.Block;
+import engine.world.BlockType;
 import engine.world.Transform;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -60,7 +59,8 @@ public class MyGame implements GameLogic {
     private Matrix4f model;
     private Matrix4f projection;
 
-    private List<Transform> blocks = new ArrayList<>();
+    private Block[][] world;
+    private static final int WORLD_SIZE = 7;
 
     private static final float MOUSE_SENS = 0.1f;
     private static final float MOVE_SPEED = 3.0f;
@@ -79,9 +79,11 @@ public class MyGame implements GameLogic {
         model = new Matrix4f();
         projection = Matrix4f.perspective(70f, 1280f / 720f, 0.1f, 100f);
 
-        for (int x = -3; x <= 3; x++) {
-            for (int z = -3; z <= 3; z++) {
-                blocks.add(new Transform(x, 0, z));
+        world = new Block[WORLD_SIZE][WORLD_SIZE];
+
+        for (int x = 0; x < WORLD_SIZE; x++) {
+            for (int z = 0; z < WORLD_SIZE; z++) {
+                world[x][z] = new Block(BlockType.GRASS);
             }
         }
     }
@@ -125,8 +127,16 @@ public class MyGame implements GameLogic {
 
     @Override
     public void render() {
-        for (Transform t : blocks) {
-            renderer.render(cube, shader, t.toModelMatrix(), camera.getViewMatrix(), projection);
+        for (int x = 0; x < WORLD_SIZE; x++) {
+            for (int z = 0; z < WORLD_SIZE; z++) {
+                Block block = world[x][z];
+
+                if (block.getType() == BlockType.AIR) { continue; }
+
+                Matrix4f model = new Matrix4f().identity().translate(x, 0, z);
+
+                renderer.render(cube, shader, model, camera.getViewMatrix(), projection);
+            }
         }
 
 
