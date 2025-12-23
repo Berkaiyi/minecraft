@@ -9,8 +9,6 @@ import engine.render.ShaderProgram;
 import engine.scene.Camera;
 import engine.world.Block;
 import engine.world.BlockType;
-import engine.world.Transform;
-import org.joml.Vector3f;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -98,27 +96,14 @@ public class MyGame implements GameLogic {
 
         float v = (float) dt * MOVE_SPEED;
 
-        Vector3f forwardXZ = new Vector3f(camera.getForward().x, 0, camera.getForward().z).normalize();
+        if (input.isKeyDown(GLFW_KEY_W))            { camera.addMoveForward(); }
+        if (input.isKeyDown(GLFW_KEY_S))            { camera.addMoveBackward(); }
+        if (input.isKeyDown(GLFW_KEY_D))            { camera.addMoveRight(); }
+        if (input.isKeyDown(GLFW_KEY_A))            { camera.addMoveLeft(); }
+        if (input.isKeyDown(GLFW_KEY_SPACE))        { camera.addMoveUp(); }
+        if (input.isKeyDown(GLFW_KEY_LEFT_SHIFT))   { camera.addMoveDown(); }
 
-        if (input.isKeyDown(GLFW_KEY_W)) {
-            camera.getPosition().add(forwardXZ.mul(v));
-        }
-        if (input.isKeyDown(GLFW_KEY_S)) {
-            camera.getPosition().sub(forwardXZ.mul(v));
-        }
-        if (input.isKeyDown(GLFW_KEY_D)) {
-            camera.getPosition().add(camera.getRight().mul(v));
-        }
-        if (input.isKeyDown(GLFW_KEY_A)) {
-            camera.getPosition().sub(camera.getRight().mul(v));
-        }
-
-        if (input.isKeyDown(GLFW_KEY_SPACE)) {
-            camera.getPosition().add(camera.getUp().mul(v));
-        }
-        if (input.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-            camera.getPosition().sub(camera.getUp().mul(v));
-        }
+        camera.move(v);
     }
 
     @Override
