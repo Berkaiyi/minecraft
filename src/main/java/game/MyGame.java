@@ -86,11 +86,6 @@ public class MyGame implements GameLogic {
 
     @Override
     public void update(double dt, Input input) {
-        float dx = (float) input.consumeMouseDeltaX();
-        float dy = (float) input.consumeMouseDeltaY();
-
-        camera.addYawPitch(dx * MOUSE_SENS, -dy * MOUSE_SENS);
-
         float v = (float) dt * MOVE_SPEED;
 
         if (input.isActionDown(Action.MOVE_FORWARD))    { camera.addMoveForward(); }
@@ -104,7 +99,12 @@ public class MyGame implements GameLogic {
     }
 
     @Override
-    public void render() {
+    public void render(Input input) {
+        float dx = (float) input.consumeMouseDeltaX();
+        float dy = (float) input.consumeMouseDeltaY();
+
+        camera.addYawPitch(dx * MOUSE_SENS, -dy * MOUSE_SENS);
+
         for (int x = 0; x < WORLD_SIZE; x++) {
             for (int z = 0; z < WORLD_SIZE; z++) {
                 Block block = world[x][z];

@@ -6,7 +6,7 @@ import engine.input.Input;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class Game {
-    private static final int TARGET_UPS = 120;
+    private static final int TARGET_UPS = 60;
     private static final double TIME_PER_UPDATE = 1.0 / TARGET_UPS;
 
     private int fps;
@@ -77,7 +77,7 @@ public class Game {
             }
 
             window.clear();
-            logic.render();
+            logic.render(input);
             window.swapBuffers();
             fps++;
 
