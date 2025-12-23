@@ -39,8 +39,8 @@ public class Game {
         window.init();
 
         timer = new Timer();
-
         input = new Input(window.getHandle());
+
         input.registerKey(GLFW_KEY_ESCAPE);
         input.registerKey(GLFW_KEY_W);
         input.registerKey(GLFW_KEY_A);

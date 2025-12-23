@@ -3,6 +3,7 @@ package engine.window;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
+import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 
@@ -14,10 +15,10 @@ import static org.lwjgl.opengl.GL11.*;
 
 public class Window {
     private long window;
-    private final String title;
+    private String title;
     private int width, height;
     private int fbWidth, fbHeight;
-    private boolean maximised, resize, vSync;
+    private boolean resize, vSync;
     private GLFWFramebufferSizeCallback fbCallback;
 
     public Window(String title, int width, int height, boolean vSync) {
@@ -42,7 +43,7 @@ public class Window {
         GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GLFW.GLFW_FALSE);
         GLFW.glfwWindowHint(GLFW.GLFW_RESIZABLE, GLFW.GLFW_TRUE);
 
-        maximised = false;
+        boolean maximised = false;
         if (width == 0 || height == 0) {
             width = 100;
             height = 100;
@@ -62,8 +63,22 @@ public class Window {
             glViewport(0, 0, this.fbWidth, this.fbHeight);
         });
 
+        if (maximised) {
+            GLFW.glfwMaximizeWindow(window);
+        }
+        else {
+            GLFWVidMode vidMode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor());
+            if (vidMode != null) {
+                GLFW.glfwSetWindowPos(window,
+                        (vidMode.width() - width) / 2,
+                        (vidMode.height() - height) / 2);
+            }
+        }
+
         GLFW.glfwMakeContextCurrent(window);
-        GLFW.glfwSwapInterval(1);
+        if (isVsync()) {
+            GLFW.glfwSwapInterval(1);
+        }
         GLFW.glfwShowWindow(window);
 
         GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
@@ -71,6 +86,9 @@ public class Window {
         GL.createCapabilities();
 
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_STENCIL_TEST);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
         glDepthFunc(GL_LESS);
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -85,6 +103,15 @@ public class Window {
 
     public boolean isResize() { return resize; }
     public void setResize(boolean resize) { this.resize = resize; }
+    public boolean isVsync() { return vSync; }
+    public void setVsync(boolean vSync) { this.vSync = vSync; }
+    public String getTitle() {
+        return title;
+    }
+    public void setTitle(String title) {
+        GLFW.glfwSetWindowTitle(window, title);
+        this.title = title;
+    }
     public long getHandle() { return window; }
     public void pollEvents() { GLFW.glfwPollEvents(); }
     public void clear() {
