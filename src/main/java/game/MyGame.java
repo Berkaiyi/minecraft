@@ -2,7 +2,7 @@ package game;
 
 import engine.core.GameLogic;
 import engine.input.Input;
-import engine.math.Matrix4f;
+import org.joml.Matrix4f;
 import engine.render.Mesh;
 import engine.render.Renderer;
 import engine.render.ShaderProgram;
@@ -10,6 +10,7 @@ import engine.scene.Camera;
 import engine.world.Block;
 import engine.world.BlockType;
 import engine.world.Transform;
+import org.joml.Vector3f;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -77,7 +78,7 @@ public class MyGame implements GameLogic {
 
         camera = new Camera();
         model = new Matrix4f();
-        projection = Matrix4f.perspective(70f, 1280f / 720f, 0.1f, 100f);
+        projection = new Matrix4f().perspective((float) Math.toRadians(70f), 1280f / 720f, 0.1f, 100f);
 
         world = new Block[WORLD_SIZE][WORLD_SIZE];
 
@@ -97,32 +98,27 @@ public class MyGame implements GameLogic {
 
         float v = (float) dt * MOVE_SPEED;
 
+        Vector3f forwardXZ = new Vector3f(camera.getForward().x, 0, camera.getForward().z).normalize();
+
         if (input.isKeyDown(GLFW_KEY_W)) {
-            camera.move(camera.getForwardXZ().mul(v));
+            camera.getPosition().add(forwardXZ.mul(v));
         }
         if (input.isKeyDown(GLFW_KEY_S)) {
-            camera.move(camera.getForwardXZ().mul(-v));
+            camera.getPosition().sub(forwardXZ.mul(v));
         }
         if (input.isKeyDown(GLFW_KEY_D)) {
-            camera.move(camera.getRight().mul(v));
+            camera.getPosition().add(camera.getRight().mul(v));
         }
         if (input.isKeyDown(GLFW_KEY_A)) {
-            camera.move(camera.getRight().mul(-v));
+            camera.getPosition().sub(camera.getRight().mul(v));
         }
 
         if (input.isKeyDown(GLFW_KEY_SPACE)) {
-            camera.move(camera.getUp().mul(v));
+            camera.getPosition().add(camera.getUp().mul(v));
         }
         if (input.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-            camera.move(camera.getUp().mul(-v));
+            camera.getPosition().sub(camera.getUp().mul(v));
         }
-
-        rotationTime += dt;
-
-        Matrix4f rotX = Matrix4f.rotationX(rotationTime);
-        Matrix4f rotY = Matrix4f.rotationY(rotationTime);
-
-        model = rotX.mul(rotY);
     }
 
     @Override
@@ -133,7 +129,7 @@ public class MyGame implements GameLogic {
 
                 if (block.getType() == BlockType.AIR) { continue; }
 
-                Matrix4f model = new Matrix4f().identity().translate(x, 0, z);
+                Matrix4f model = new Matrix4f().translation(x, 0, z);
 
                 renderer.render(cube, shader, model, camera.getViewMatrix(), projection);
             }
