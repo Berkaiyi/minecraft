@@ -51,6 +51,10 @@ public class Camera {
         right = new Vector3f(rx, ry, rz).normalize();
     }
 
+    public Vector3f getForwardXZ() {
+        return new Vector3f(forward.x, 0f, forward.z).normalize();
+    }
+
     public Matrix4f getViewMatrix() {
         return Matrix4f.lookAt(position, forward, up);
     }

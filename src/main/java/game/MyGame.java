@@ -7,6 +7,10 @@ import engine.render.Mesh;
 import engine.render.Renderer;
 import engine.render.ShaderProgram;
 import engine.scene.Camera;
+import engine.world.Transform;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -56,6 +60,8 @@ public class MyGame implements GameLogic {
     private Matrix4f model;
     private Matrix4f projection;
 
+    private List<Transform> blocks = new ArrayList<>();
+
     private static final float MOUSE_SENS = 0.1f;
     private static final float MOVE_SPEED = 3.0f;
 
@@ -71,8 +77,13 @@ public class MyGame implements GameLogic {
 
         camera = new Camera();
         model = new Matrix4f();
-
         projection = Matrix4f.perspective(70f, 1280f / 720f, 0.1f, 100f);
+
+        for (int x = -3; x <= 3; x++) {
+            for (int z = -3; z <= 3; z++) {
+                blocks.add(new Transform(x, 0, z));
+            }
+        }
     }
 
     @Override
@@ -85,10 +96,10 @@ public class MyGame implements GameLogic {
         float v = (float) dt * MOVE_SPEED;
 
         if (input.isKeyDown(GLFW_KEY_W)) {
-            camera.move(camera.getForward().mul(v));
+            camera.move(camera.getForwardXZ().mul(v));
         }
         if (input.isKeyDown(GLFW_KEY_S)) {
-            camera.move(camera.getForward().mul(-v));
+            camera.move(camera.getForwardXZ().mul(-v));
         }
         if (input.isKeyDown(GLFW_KEY_D)) {
             camera.move(camera.getRight().mul(v));
@@ -114,7 +125,11 @@ public class MyGame implements GameLogic {
 
     @Override
     public void render() {
-        renderer.render(cube, shader, model, camera.getViewMatrix(), projection);
+        for (Transform t : blocks) {
+            renderer.render(cube, shader, t.toModelMatrix(), camera.getViewMatrix(), projection);
+        }
+
+
     }
 
     @Override
