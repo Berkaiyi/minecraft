@@ -3,13 +3,12 @@ package game;
 import engine.core.GameLogic;
 import engine.input.Action;
 import engine.input.Input;
+import engine.world.*;
 import org.joml.Matrix4f;
 import engine.render.Mesh;
 import engine.render.Renderer;
 import engine.render.ShaderProgram;
 import engine.scene.Camera;
-import engine.world.Block;
-import engine.world.BlockType;
 
 public class MyGame implements GameLogic {
     private static final float[] CUBE_VERTICES = {
@@ -53,11 +52,13 @@ public class MyGame implements GameLogic {
     private Mesh cube;
     private ShaderProgram shader;
     private Camera camera;
+    private Chunk chunk;
+    private ChunkMesh chunkMesh;
 
     private Matrix4f model;
     private Matrix4f projection;
 
-    private Block[][] world;
+    //private Block[][] world;
     private static final int WORLD_SIZE = 7;
 
     private static final float MOUSE_SENS = 0.1f;
@@ -75,6 +76,7 @@ public class MyGame implements GameLogic {
         model = new Matrix4f();
         projection = new Matrix4f().perspective((float) Math.toRadians(70f), 1280f / 720f, 0.1f, 100f);
 
+        /*
         world = new Block[WORLD_SIZE][WORLD_SIZE];
 
         for (int x = 0; x < WORLD_SIZE; x++) {
@@ -82,6 +84,20 @@ public class MyGame implements GameLogic {
                 world[x][z] = new Block(BlockType.GRASS);
             }
         }
+         */
+        chunk = new Chunk(new ChunkPos(0, 0));
+
+        for (int x = 0; x < Chunk.SIZE_X; x++) {
+            for (int z = 0; z < Chunk.SIZE_Z; z++) {
+                chunk.setBlock(x, 0, z, BlockType.GRASS);
+            }
+        }
+
+        chunk.setBlock(5, 1, 0, BlockType.STONE);
+        chunk.setBlock(5, 1, 1, BlockType.STONE);
+        chunk.setBlock(5, 2, 2, BlockType.STONE);
+
+        chunkMesh = ChunkMeshBuilder.build(chunk);
     }
 
     @Override
@@ -105,6 +121,7 @@ public class MyGame implements GameLogic {
 
         camera.addYawPitch(dx * MOUSE_SENS, -dy * MOUSE_SENS);
 
+        /*
         for (int x = 0; x < WORLD_SIZE; x++) {
             for (int z = 0; z < WORLD_SIZE; z++) {
                 Block block = world[x][z];
@@ -116,6 +133,8 @@ public class MyGame implements GameLogic {
                 renderer.render(cube, shader, model, camera.getViewMatrix(), projection);
             }
         }
+         */
+        renderer.render(chunkMesh.getMesh(), shader, model, camera.getViewMatrix(), projection);
 
 
     }
