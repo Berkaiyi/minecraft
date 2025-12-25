@@ -47,9 +47,6 @@ public class ChunkMeshBuilder {
         float[] rect = atlas.uvRect(type.tileX(), type.tileY());
         float u0 = rect[0], v0 = rect[1], u1 = rect[2], v1 = rect[3];
 
-        // Color
-        float r = 0.3f, g = 0.8f, b = 0.3f;
-
         for (int i = 0; i < 4; i++) {
             int[] lv = face.vertices[i];
 
@@ -67,10 +64,6 @@ public class ChunkMeshBuilder {
             float v = (fv == 0f) ? v0 : v1;
             vertices.add(u);
             vertices.add(v);
-
-            vertices.add(r);
-            vertices.add(g);
-            vertices.add(b);
         }
 
         indices.add(indexOffset);

@@ -19,7 +19,6 @@ public class MyGame implements GameLogic {
     private Texture atlasTexture;
     private TextureAtlas atlas;
 
-    private Matrix4f model;
     private Matrix4f projection;
 
     private static final float MOUSE_SENS = 0.1f;
@@ -34,7 +33,6 @@ public class MyGame implements GameLogic {
         atlas = new TextureAtlas(16, 16);
 
         camera = new Camera();
-        model = new Matrix4f();
         projection = new Matrix4f().perspective((float) Math.toRadians(70f), 1280f / 720f, 0.1f, 100f);
 
         Chunk chunk = new Chunk(new ChunkPos(0, 0));
@@ -77,7 +75,7 @@ public class MyGame implements GameLogic {
         float dy = (float) input.consumeMouseDeltaY();
 
         camera.addYawPitch(dx * MOUSE_SENS, -dy * MOUSE_SENS);
-        renderer.render(chunkMesh.getMesh(), shader, model, camera.getViewMatrix(), projection);
+        renderer.render(chunkMesh.getMesh(), shader, new Matrix4f(), camera.getViewMatrix(), projection);
     }
 
     @Override
