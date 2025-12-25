@@ -36,7 +36,7 @@ public class Game {
     }
 
     private void init() {
-        window = new Window("LWJGL Engine", 1280, 720, true);
+        window = new Window("LWJGL Engine", 1920, 1080, true);
         window.init();
 
         timer = new Timer();

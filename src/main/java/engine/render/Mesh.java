@@ -16,7 +16,7 @@ public class Mesh {
     private final int indexCount;
 
     private static final int FLOAT_SIZE = 4;
-    private static final int STRIDE = 9 * FLOAT_SIZE;
+    private static final int STRIDE = 11 * FLOAT_SIZE;
 
     public Mesh(float[] vertices, int[] indices) {
         indexCount = indices.length;
@@ -39,8 +39,11 @@ public class Mesh {
         glVertexAttribPointer(1, 3, GL_FLOAT, false, STRIDE, 3 * FLOAT_SIZE);
         glEnableVertexAttribArray(1);
 
-        glVertexAttribPointer(2, 3, GL_FLOAT, false, STRIDE, 6 * FLOAT_SIZE);
+        glVertexAttribPointer(2, 2, GL_FLOAT, false, STRIDE, 6 * FLOAT_SIZE);
         glEnableVertexAttribArray(2);
+
+        glVertexAttribPointer(3, 3, GL_FLOAT, false, STRIDE, 8 * FLOAT_SIZE);
+        glEnableVertexAttribArray(3);
 
 
         eboId = glGenBuffers();

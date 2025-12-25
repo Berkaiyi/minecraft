@@ -9,8 +9,6 @@ import static org.lwjgl.opengl.GL20.*;
 import org.joml.Matrix4f;
 import org.lwjgl.system.MemoryStack;
 
-import java.nio.FloatBuffer;
-
 public class ShaderProgram {
     private final int programId;
 
@@ -37,14 +35,22 @@ public class ShaderProgram {
     }
 
     public void setUniformMat4f(String name, Matrix4f mat) {
-        int loc = glGetUniformLocation(programId, name);
-        if (loc < 0) {
+        int location = glGetUniformLocation(programId, name);
+        if (location < 0) {
             throw new RuntimeException("Uniform not found" + name);
         }
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            glUniformMatrix4fv(loc, false, mat.get(stack.mallocFloat(16)));
+            glUniformMatrix4fv(location, false, mat.get(stack.mallocFloat(16)));
         }
+    }
+
+    public void setUniform1i(String name, int value) {
+        int location = glGetUniformLocation(programId, name);
+        if (location < 0) {
+            throw new RuntimeException("Uniform not found" + name);
+        }
+        glUniform1i(location, value);
     }
 
     private static String loadResource(String path) {

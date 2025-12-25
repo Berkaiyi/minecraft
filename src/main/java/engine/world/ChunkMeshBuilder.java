@@ -1,10 +1,12 @@
 package engine.world;
 
+import engine.render.TextureAtlas;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class ChunkMeshBuilder {
-    public static ChunkMesh build(Chunk chunk) {
+    public static ChunkMesh build(Chunk chunk, TextureAtlas atlas) {
         List<Float> vertices = new ArrayList<>();
         List<Integer> indices = new ArrayList<>();
         int indexOffset = 0;
@@ -18,7 +20,7 @@ public class ChunkMeshBuilder {
 
                     for (Face face : Face.values()) {
                         if (isFaceVisible(chunk, x, y, z, face)) {
-                            addFace(vertices, indices, x, y, z, face, indexOffset);
+                            addFace(vertices, indices, x, y, z, face, indexOffset, block.getType(), atlas);
                             indexOffset += 4;
                         }
                     }
@@ -34,25 +36,37 @@ public class ChunkMeshBuilder {
             List<Integer> indices,
             int x, int y, int z,
             Face face,
-            int indexOffset
+            int indexOffset,
+            BlockType type,
+            TextureAtlas atlas
     ) {
         float nx = face.nx;
         float ny = face.ny;
         float nz = face.nz;
 
+        float[] rect = atlas.uvRect(type.tileX(), type.tileY());
+        float u0 = rect[0], v0 = rect[1], u1 = rect[2], v1 = rect[3];
+
         // Color
         float r = 0.3f, g = 0.8f, b = 0.3f;
 
         for (int i = 0; i < 4; i++) {
-            int[] v = face.vertices[i];
+            int[] lv = face.vertices[i];
 
-            vertices.add((float) x + v[0]);
-            vertices.add((float) y + v[1]);
-            vertices.add((float) z + v[2]);
+            vertices.add((float) x + lv[0]);
+            vertices.add((float) y + lv[1]);
+            vertices.add((float) z + lv[2]);
 
             vertices.add(nx);
             vertices.add(ny);
             vertices.add(nz);
+
+            float fu = face.uvs[i * 2];
+            float fv = face.uvs[i * 2 + 1];
+            float u = (fu == 0f) ? u0 : u1;
+            float v = (fv == 0f) ? v0 : v1;
+            vertices.add(u);
+            vertices.add(v);
 
             vertices.add(r);
             vertices.add(g);
@@ -71,13 +85,6 @@ public class ChunkMeshBuilder {
         int nx = x + f.nx;
         int ny = y + f.ny;
         int nz = z + f.nz;
-
-        if (x == 0 && y == 2 && z == 0 && f == Face.SOUTH) {
-            System.out.println(
-                    "CHECK SOUTH: neighbor coords = (" +
-                            nx + "," + ny + "," + nz + ")"
-            );
-        }
 
         if (nx < 0 || nx >= Chunk.SIZE_X ||
             ny < 0 || ny >= Chunk.SIZE_Y ||
