@@ -3,6 +3,7 @@ package engine.input;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
+import org.lwjgl.glfw.GLFWMouseButtonCallback;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,9 +12,11 @@ public class Input {
     private final long windowHandle;
     private final Map<Action, Integer> bindings = new HashMap<>();
     private final Map<Integer, KeyState> keys = new HashMap<>();
+    private final Map<Integer, KeyState> mouseButtons = new HashMap<>();
 
     private GLFWCursorPosCallback cursorCallback;
     private GLFWKeyCallback keyCallback;
+    private GLFWMouseButtonCallback mouseButtonCallback;
 
     private double mouseX, mouseY;
     private double lastMouseX, lastMouseY;
@@ -31,6 +34,12 @@ public class Input {
             else if (action == GLFW.GLFW_RELEASE) {
                 keys.put(key, KeyState.RELEASED);
             }
+        });
+
+        mouseButtonCallback = GLFW.glfwSetMouseButtonCallback(windowHandle, (win, button, action, mods) -> {
+            if (!mouseButtons.containsKey(button)) return;
+            if (action == GLFW.GLFW_PRESS) mouseButtons.put(button, KeyState.PRESSED);
+            else if (action == GLFW.GLFW_RELEASE) mouseButtons.put(button, KeyState.RELEASED);
         });
 
         cursorCallback = GLFW.glfwSetCursorPosCallback(windowHandle, (win, x, y) -> {
@@ -51,13 +60,14 @@ public class Input {
     public void update() {
         for (int key : keys.keySet()) {
             KeyState state = keys.get(key);
+            if (state == KeyState.PRESSED) { keys.put(key, KeyState.DOWN); }
+            else if (state == KeyState.RELEASED) { keys.put(key, KeyState.UP); }
+        }
 
-            if (state == KeyState.PRESSED) {
-                keys.put(key, KeyState.DOWN);
-            }
-            else if (state == KeyState.RELEASED) {
-                keys.put(key, KeyState.UP);
-            }
+        for (int button : mouseButtons.keySet()) {
+            KeyState state = mouseButtons.get(button);
+            if (state == KeyState.PRESSED) { mouseButtons.put(button, KeyState.DOWN); }
+            else if (state == KeyState.RELEASED) { mouseButtons.put(button, KeyState.UP); }
         }
     }
 
@@ -68,35 +78,23 @@ public class Input {
 
     public boolean isActionDown(Action action) {
         Integer key = bindings.get(action);
-        return (key != null) && (isKeyDown(key));
-    }
-
-    public void registerKey(int key) {
-        keys.putIfAbsent(key, KeyState.UP);
-    }
-
-    public boolean isKeyPressed(int key) {
-        KeyState state = keys.get(key);
-        if (state == null) {
-            throw new IllegalStateException("Key is not registered: " + key);
+        if (key == null) {
+            System.out.println("Action: " + action + " is not bound!");
+            return false;
         }
-        return state == KeyState.PRESSED;
+        return isKeyDown(key);
     }
 
-    public boolean isKeyDown(int key) {
-        return keys.get(key) == KeyState.DOWN || keys.get(key) == KeyState.PRESSED;
-    }
+    public void registerKey(int key) { keys.putIfAbsent(key, KeyState.UP); }
+    public void registerMouseButton(int button) { mouseButtons.putIfAbsent(button, KeyState.UP); }
 
-    public boolean isKeyReleased(int key) {
-        return keys.get(key) == KeyState.RELEASED;
-    }
-
+    public double getMouseX() { return mouseX; }
+    public double getMouseY() { return mouseY; }
     public double consumeMouseDeltaX() {
         double dx = deltaX;
         deltaX = 0;
         return dx;
     }
-
     public double consumeMouseDeltaY() {
         double dy = deltaY;
         deltaY = 0;
@@ -112,5 +110,26 @@ public class Input {
     public void cleanup() {
         if (cursorCallback != null) { cursorCallback.free(); }
         if (keyCallback != null) { keyCallback.free(); }
+        if (mouseButtonCallback != null) { mouseButtonCallback.free(); }
+    }
+
+    private boolean isKeyPressed(int key) {
+        return keys.get(key) == KeyState.PRESSED;
+    }
+    private boolean isKeyDown(int key) {
+        return keys.get(key) == KeyState.DOWN || keys.get(key) == KeyState.PRESSED;
+    }
+    private boolean isKeyReleased(int key) {
+        return keys.get(key) == KeyState.RELEASED;
+    }
+    // MAKE PRIVATE
+    public boolean isMousePressed(int button) {
+        return mouseButtons.get(button) == KeyState.PRESSED;
+    }
+    private boolean isMouseDown(int button) {
+        return mouseButtons.get(button) == KeyState.DOWN || mouseButtons.get(button) == KeyState.PRESSED;
+    }
+    private boolean isMouseReleased(int button) {
+        return mouseButtons.get(button) == KeyState.RELEASED;
     }
 }

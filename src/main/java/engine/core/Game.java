@@ -1,8 +1,12 @@
 package engine.core;
 
 import engine.input.Action;
+import engine.screen.Screen;
 import engine.window.Window;
 import engine.input.Input;
+import game.screens.GameScreen;
+import game.screens.MainMenuScreen;
+
 import static org.lwjgl.glfw.GLFW.*;
 
 public class Game {
@@ -12,18 +16,17 @@ public class Game {
     private int fps;
     private int ups;
 
-    private final GameLogic logic;
     private Window window;
     private Timer timer;
     private Input input;
 
-    public Game(GameLogic logic) {
-        this.logic = logic;
-    }
+    private Screen currentScreen;
 
     public void run() {
         try {
             init();
+            setScreen(new GameScreen(this));
+
             loop();
         }
         catch (Throwable t) {
@@ -34,6 +37,14 @@ public class Game {
             cleanup();
         }
     }
+
+    public void setScreen(Screen next) {
+        if (currentScreen != null) { currentScreen.cleanup(); }
+        currentScreen = next;
+        currentScreen.init();
+    }
+
+    public Window getWindow() { return window; }
 
     private void init() {
         window = new Window("LWJGL Engine", 1920, 1080, true);
@@ -49,8 +60,6 @@ public class Game {
         input.bind(Action.MOVE_RIGHT, GLFW_KEY_D);
         input.bind(Action.MOVE_UP, GLFW_KEY_SPACE);
         input.bind(Action.MOVE_DOWN, GLFW_KEY_LEFT_SHIFT);
-
-        logic.init();
     }
 
     private void loop() {
@@ -71,13 +80,13 @@ public class Game {
             input.update();
 
             while (accumulator >= TIME_PER_UPDATE) {
-                logic.update(TIME_PER_UPDATE, input);
+                if (currentScreen != null) { currentScreen.update(TIME_PER_UPDATE, input); }
                 ups++;
                 accumulator -= TIME_PER_UPDATE;
             }
 
             window.clear();
-            logic.render(input);
+            if (currentScreen != null) { currentScreen.render(input); }
             window.swapBuffers();
             fps++;
 
@@ -90,8 +99,8 @@ public class Game {
     }
 
     private void cleanup() {
+        if (currentScreen != null) { currentScreen.cleanup(); }
         input.cleanup();
-        logic.cleanup();
         window.destroy();
     }
 }

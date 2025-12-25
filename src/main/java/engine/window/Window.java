@@ -101,6 +101,8 @@ public class Window {
         }
     }
 
+    public int getFbWidth() { return fbWidth; }
+    public int getFbHeight() { return fbHeight; }
     public boolean isResize() { return resize; }
     public void setResize(boolean resize) { this.resize = resize; }
     public boolean isVsync() { return vSync; }
@@ -112,13 +114,17 @@ public class Window {
         GLFW.glfwSetWindowTitle(window, title);
         this.title = title;
     }
+    public void setCursorCaptured(boolean captured) {
+        GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR,
+                captured ? GLFW.GLFW_CURSOR_DISABLED : GLFW.GLFW_CURSOR_NORMAL);
+    }
+
     public long getHandle() { return window; }
     public void pollEvents() { GLFW.glfwPollEvents(); }
     public void clear() {
         GL11.glClearColor(0f, 0f, 0f, 0f);
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
-
     public void swapBuffers() { GLFW.glfwSwapBuffers(window); }
     public boolean shouldClose() { return GLFW.glfwWindowShouldClose(window); }
     public void close() { GLFW.glfwSetWindowShouldClose(window, true); }
