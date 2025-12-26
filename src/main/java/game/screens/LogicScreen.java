@@ -4,7 +4,6 @@ import engine.core.Game;
 import engine.input.Input;
 import engine.screen.Screen;
 import game.logic.ScreenLogic;
-import kotlin.reflect.KCallable;
 
 public class LogicScreen implements Screen {
     protected final Game game;
@@ -54,6 +53,4 @@ public class LogicScreen implements Screen {
     public void cleanup() {
         logic.cleanup();
     }
-
-
 }

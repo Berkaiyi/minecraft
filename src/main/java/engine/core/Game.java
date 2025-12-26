@@ -5,6 +5,7 @@ import engine.screen.Screen;
 import engine.window.Window;
 import engine.input.Input;
 import game.screens.GameScreen;
+import game.screens.MainMenuScreen;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -24,7 +25,7 @@ public class Game {
     public void run() {
         try {
             init();
-            setScreen(new GameScreen(this));
+            setScreen(new MainMenuScreen(this));
 
             loop();
         }

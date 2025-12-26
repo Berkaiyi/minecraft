@@ -1,20 +1,24 @@
 package game.logic;
 
+import engine.core.Game;
 import engine.core.GameLogic;
 import engine.input.Action;
 import engine.input.Input;
 import engine.render.Texture;
 import engine.render.TextureAtlas;
 import engine.world.*;
+import game.screens.MainMenuScreen;
+import launcher.Main;
 import org.joml.Matrix4f;
 import engine.render.Renderer;
 import engine.render.ShaderProgram;
 import engine.scene.Camera;
 
-public class VoxelGame implements GameLogic {
+public class VoxelGame implements ScreenLogic {
     private Renderer renderer;
     private ShaderProgram shader;
     private Camera camera;
+
     private ChunkMesh chunkMesh;
     private Texture atlasTexture;
     private TextureAtlas atlas;
@@ -25,7 +29,7 @@ public class VoxelGame implements GameLogic {
     private static final float MOVE_SPEED = 3.0f;
 
     @Override
-    public void init() {
+    public void init(Game game) {
         renderer = new Renderer();
         shader = new ShaderProgram("/shaders/atlas.vert", "/shaders/atlas.frag");
 
@@ -51,6 +55,18 @@ public class VoxelGame implements GameLogic {
     }
 
     @Override
+    public void onResize(Game game) {
+        rebuildProjection(game);
+    }
+
+    @Override
+    public void handleInput(Game game, Input input) {
+        if (input.isActionDown(Action.EXIT)) {
+            game.setScreen(new MainMenuScreen(game));
+        }
+    }
+
+    @Override
     public void update(double dt, Input input) {
         float v = (float) dt * MOVE_SPEED;
 
@@ -65,7 +81,7 @@ public class VoxelGame implements GameLogic {
     }
 
     @Override
-    public void render(Input input) {
+    public void render(Game game, Input input) {
         atlasTexture.bind(0);
         shader.bind();
         shader.setUniform1i("uAtlas", 0);
@@ -83,5 +99,13 @@ public class VoxelGame implements GameLogic {
         if (chunkMesh != null) { chunkMesh.cleanup(); }
         if (shader != null) { shader.cleanup(); }
         if (atlasTexture != null) { atlasTexture.cleanup(); }
+    }
+
+    private void rebuildProjection(Game game) {
+        int w = game.getWindow().getFbWidth();
+        int h = game.getWindow().getFbHeight();
+        float aspect = (h == 0) ? 1f : (float) w / (float) h;
+
+        projection = new Matrix4f().perspective((float) Math.toRadians(70f), aspect, 0.1f, 100f);
     }
 }
