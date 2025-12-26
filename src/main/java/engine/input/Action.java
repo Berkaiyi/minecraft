@@ -7,5 +7,6 @@ public enum Action {
     MOVE_RIGHT,
     MOVE_UP,
     MOVE_DOWN,
-    EXIT
+    EXIT,
+    LEFT_CLICK
 }

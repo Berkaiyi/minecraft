@@ -1,4 +1,4 @@
-package game;
+package game.logic;
 
 import engine.core.GameLogic;
 import engine.input.Action;
@@ -11,7 +11,7 @@ import engine.render.Renderer;
 import engine.render.ShaderProgram;
 import engine.scene.Camera;
 
-public class MyGame implements GameLogic {
+public class VoxelGame implements GameLogic {
     private Renderer renderer;
     private ShaderProgram shader;
     private Camera camera;

@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 
 import static org.lwjgl.opengl.GL20.*;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.lwjgl.system.MemoryStack;
 
 public class ShaderProgram {
@@ -51,6 +52,14 @@ public class ShaderProgram {
             throw new RuntimeException("Uniform not found" + name);
         }
         glUniform1i(location, value);
+    }
+
+    public void setUniform3f(String name, Vector3f value) {
+        int location = glGetUniformLocation(programId, name);
+        if (location < 0) {
+            throw new RuntimeException("Uniform not found" + name);
+        }
+        glUniform3f(location, value.x, value.y, value.z);
     }
 
     private static String loadResource(String path) {

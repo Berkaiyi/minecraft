@@ -5,7 +5,6 @@ import engine.screen.Screen;
 import engine.window.Window;
 import engine.input.Input;
 import game.screens.GameScreen;
-import game.screens.MainMenuScreen;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -53,13 +52,14 @@ public class Game {
         timer = new Timer();
         input = new Input(window.getHandle());
 
-        input.bind(Action.EXIT, GLFW_KEY_ESCAPE);
-        input.bind(Action.MOVE_FORWARD, GLFW_KEY_W);
-        input.bind(Action.MOVE_LEFT, GLFW_KEY_A);
-        input.bind(Action.MOVE_BACKWARD, GLFW_KEY_S);
-        input.bind(Action.MOVE_RIGHT, GLFW_KEY_D);
-        input.bind(Action.MOVE_UP, GLFW_KEY_SPACE);
-        input.bind(Action.MOVE_DOWN, GLFW_KEY_LEFT_SHIFT);
+        input.bindKey(Action.EXIT, GLFW_KEY_ESCAPE);
+        input.bindKey(Action.MOVE_FORWARD, GLFW_KEY_W);
+        input.bindKey(Action.MOVE_LEFT, GLFW_KEY_A);
+        input.bindKey(Action.MOVE_BACKWARD, GLFW_KEY_S);
+        input.bindKey(Action.MOVE_RIGHT, GLFW_KEY_D);
+        input.bindKey(Action.MOVE_UP, GLFW_KEY_SPACE);
+        input.bindKey(Action.MOVE_DOWN, GLFW_KEY_LEFT_SHIFT);
+        input.bindButton(Action.LEFT_CLICK, GLFW_MOUSE_BUTTON_LEFT);
     }
 
     private void loop() {
@@ -72,12 +72,12 @@ public class Game {
             window.pollEvents();
 
             // INPUT -----------
-            if (input.isActionDown(Action.EXIT)) {
-                window.close();
-            }
+            //if (input.isActionDown(Action.EXIT)) {
+            //    window.close();
+            //}
             // -----------
 
-            input.update();
+            if (currentScreen != null) { currentScreen.handleInput(input); }
 
             while (accumulator >= TIME_PER_UPDATE) {
                 if (currentScreen != null) { currentScreen.update(TIME_PER_UPDATE, input); }
@@ -85,6 +85,7 @@ public class Game {
                 accumulator -= TIME_PER_UPDATE;
             }
 
+            input.update();
             window.clear();
             if (currentScreen != null) { currentScreen.render(input); }
             window.swapBuffers();

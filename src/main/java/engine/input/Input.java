@@ -71,9 +71,24 @@ public class Input {
         }
     }
 
-    public void bind(Action action, int glfwKey) {
+    public void bindKey(Action action, int glfwKey) {
         bindings.put(action, glfwKey);
         registerKey(glfwKey);
+    }
+    public void bindButton(Action action, int glfwButton) {
+        bindings.put(action, glfwButton);
+        registerMouseButton(glfwButton);
+    }
+
+    public boolean isActionPressed(Action action) {
+        Integer key = bindings.get(action);
+        if (key == null) {
+            System.out.println("Action: " + action + " is not bound!");
+            return false;
+        }
+        if (keys.containsKey(key)) { return isKeyPressed(key); }
+        if (mouseButtons.containsKey(key)) { return isMousePressed(key); }
+        return false;
     }
 
     public boolean isActionDown(Action action) {
@@ -82,7 +97,9 @@ public class Input {
             System.out.println("Action: " + action + " is not bound!");
             return false;
         }
-        return isKeyDown(key);
+        if (keys.containsKey(key)) { return isKeyDown(key); }
+        if (mouseButtons.containsKey(key)) { return isMouseDown(key); }
+        return false;
     }
 
     public void registerKey(int key) { keys.putIfAbsent(key, KeyState.UP); }
