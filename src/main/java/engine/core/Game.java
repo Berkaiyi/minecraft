@@ -70,15 +70,9 @@ public class Game {
             accumulator += delta;
 
             window.pollEvents();
-            window.applyResize();
-
-            // INPUT -----------
-            //if (input.isActionDown(Action.EXIT)) {
-            //    window.close();
-            //}
-            // -----------
 
             if (currentScreen != null) { currentScreen.handleInput(input); }
+            window.applyResize();
 
             while (accumulator >= TIME_PER_UPDATE) {
                 if (currentScreen != null) { currentScreen.update(TIME_PER_UPDATE, input); }
