@@ -4,7 +4,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 public class Camera {
-    private final Vector3f position =   new Vector3f(0, 1.6f, 3);
+    private final Vector3f position =   new Vector3f(8.5f, 2.6f, 8.5f);
     private final Vector3f moveDir =    new Vector3f();
     private final Vector3f temp =       new Vector3f();
 
