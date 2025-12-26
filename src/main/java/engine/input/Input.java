@@ -6,13 +6,16 @@ import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWMouseButtonCallback;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class Input {
     private final long windowHandle;
     private final Map<Action, Integer> bindings = new HashMap<>();
     private final Map<Integer, KeyState> keys = new HashMap<>();
     private final Map<Integer, KeyState> mouseButtons = new HashMap<>();
+    private final Set<Integer> mousePressedEvents = new HashSet<>(); // TODO: press+release can happen simultaneously
 
     private GLFWCursorPosCallback cursorCallback;
     private GLFWKeyCallback keyCallback;
@@ -28,18 +31,17 @@ public class Input {
 
         keyCallback = GLFW.glfwSetKeyCallback(windowHandle, (win, key, scancode, action, mods) -> {
             if (!keys.containsKey(key)) return;
-            if (action == GLFW.GLFW_PRESS) {
-                keys.put(key, KeyState.PRESSED);
-            }
-            else if (action == GLFW.GLFW_RELEASE) {
-                keys.put(key, KeyState.RELEASED);
-            }
+            if (action == GLFW.GLFW_PRESS) { keys.put(key, KeyState.PRESSED); }
+            else if (action == GLFW.GLFW_RELEASE) { keys.put(key, KeyState.RELEASED); }
         });
 
         mouseButtonCallback = GLFW.glfwSetMouseButtonCallback(windowHandle, (win, button, action, mods) -> {
             if (!mouseButtons.containsKey(button)) return;
-            if (action == GLFW.GLFW_PRESS) mouseButtons.put(button, KeyState.PRESSED);
-            else if (action == GLFW.GLFW_RELEASE) mouseButtons.put(button, KeyState.RELEASED);
+            if (action == GLFW.GLFW_PRESS) {
+                mouseButtons.put(button, KeyState.PRESSED);
+                mousePressedEvents.add(button);
+            }
+            else if (action == GLFW.GLFW_RELEASE) { mouseButtons.put(button, KeyState.RELEASED); }
         });
 
         cursorCallback = GLFW.glfwSetCursorPosCallback(windowHandle, (win, x, y) -> {
@@ -69,6 +71,8 @@ public class Input {
             if (state == KeyState.PRESSED) { mouseButtons.put(button, KeyState.DOWN); }
             else if (state == KeyState.RELEASED) { mouseButtons.put(button, KeyState.UP); }
         }
+
+        mousePressedEvents.clear();
     }
 
     public void bindKey(Action action, int glfwKey) {
@@ -139,8 +143,7 @@ public class Input {
     private boolean isKeyReleased(int key) {
         return keys.get(key) == KeyState.RELEASED;
     }
-    // MAKE PRIVATE
-    public boolean isMousePressed(int button) {
+    private boolean isMousePressed(int button) {
         return mouseButtons.get(button) == KeyState.PRESSED;
     }
     private boolean isMouseDown(int button) {

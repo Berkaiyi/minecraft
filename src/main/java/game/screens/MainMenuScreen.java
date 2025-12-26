@@ -64,7 +64,8 @@ public class MainMenuScreen implements Screen {
 
     @Override
     public void render(Input input) {
-        org.lwjgl.opengl.GL11.glDisable(org.lwjgl.opengl.GL11.GL_DEPTH_TEST);
+        org.lwjgl.opengl.GL11.glDisable(org.lwjgl.opengl.GL11.GL_CULL_FACE);
+
         int w = game.getWindow().getFbWidth();
         int h = game.getWindow().getFbHeight();
         Matrix4f ortho = new Matrix4f().setOrtho(0, w, h, 0, -1, 1);
@@ -80,7 +81,7 @@ public class MainMenuScreen implements Screen {
         drawButton(startButton, ortho, colorStart);
         drawButton(quitButton, ortho, colorQuit);
 
-        org.lwjgl.opengl.GL11.glEnable(org.lwjgl.opengl.GL11.GL_DEPTH_TEST);
+        org.lwjgl.opengl.GL11.glEnable(org.lwjgl.opengl.GL11.GL_CULL_FACE);
     }
 
     @Override
@@ -104,11 +105,11 @@ public class MainMenuScreen implements Screen {
         int w = game.getWindow().getFbWidth();
         int h = game.getWindow().getFbHeight();
 
-        float bw = 1000;
-        float bh = 500;
+        float bw = 900;
+        float bh = 120;
 
-        startButton = new Rect((w - bw) / 2f, h * 0.4f, bw, bh);
-        quitButton = new Rect((w - bw) / 2f, h * 0.4f + 70, bw, bh);
+        startButton = new Rect((w - bw) / 2f, h * 0.5f, bw, bh);
+        quitButton = new Rect((w - bw) / 2f, h * 0.5f + 150, bw, bh);
     }
 
     private void drawButton(Rect r, Matrix4f ortho, Vector3f color) {
