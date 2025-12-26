@@ -50,7 +50,7 @@ public class Game {
         window.init();
 
         timer = new Timer();
-        input = new Input(window.getHandle());
+        input = new Input(window);
 
         input.bindKey(Action.EXIT, GLFW_KEY_ESCAPE);
         input.bindKey(Action.MOVE_FORWARD, GLFW_KEY_W);

@@ -1,5 +1,6 @@
 package engine.input;
 
+import engine.window.Window;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
@@ -11,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class Input {
+    private final Window window;
     private final long windowHandle;
     private final Map<Action, Integer> bindings = new HashMap<>();
     private final Map<Integer, KeyState> keys = new HashMap<>();
@@ -26,8 +28,9 @@ public class Input {
     private double deltaX, deltaY;
     private boolean firstMouse = true;
 
-    public Input(long windowHandle) {
-        this.windowHandle = windowHandle;
+    public Input(Window window) {
+        this.window = window;
+        this.windowHandle = window.getHandle();
 
         keyCallback = GLFW.glfwSetKeyCallback(windowHandle, (win, key, scancode, action, mods) -> {
             if (!keys.containsKey(key)) return;
@@ -111,6 +114,8 @@ public class Input {
 
     public double getMouseX() { return mouseX; }
     public double getMouseY() { return mouseY; }
+    public double getMouseXFb() { return mouseX * window.getFbWidth() / window.getWidth(); }
+    public double getMouseYFb() { return mouseY * window.getFbHeight() / window.getHeight(); }
     public double consumeMouseDeltaX() {
         double dx = deltaX;
         deltaX = 0;

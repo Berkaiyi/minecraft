@@ -102,6 +102,8 @@ public class Window {
 
     public int getFbWidth() { return fbWidth; }
     public int getFbHeight() { return fbHeight; }
+    public int getWidth() { return width; }
+    public int getHeight() { return height; }
     public boolean isResize() { return resize; }
     public void applyResize()
     {

@@ -45,8 +45,8 @@ public class MainMenuScreen implements Screen {
         }
 
         if (input.isActionPressed(Action.LEFT_CLICK)) {
-            float mx = (float) input.getMouseX();
-            float my = (float) input.getMouseY();
+            float mx = (float) input.getMouseXFb();
+            float my = (float) input.getMouseYFb();
 
             if (startButton.contains(mx, my)) {
                 game.setScreen(new GameScreen(game));
@@ -69,8 +69,8 @@ public class MainMenuScreen implements Screen {
         int h = game.getWindow().getFbHeight();
         Matrix4f ortho = new Matrix4f().setOrtho(0, w, h, 0, -1, 1);
 
-        float mx = (float) input.getMouseX();
-        float my = (float) input.getMouseY();
+        float mx = (float) input.getMouseXFb();
+        float my = (float) input.getMouseYFb();
 
         Vector3f colorStart = (startButton.contains(mx, my)) ?
                 new Vector3f(0.7f, 0.7f, 0.7f) : new Vector3f(0.4f, 0.4f, 0.4f);
