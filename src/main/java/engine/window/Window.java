@@ -59,8 +59,7 @@ public class Window {
         fbCallback = GLFW.glfwSetFramebufferSizeCallback(window, (win, fbWidth, fbHeight) -> {
             this.fbWidth = fbWidth;
             this.fbHeight = fbHeight;
-            setResize(true);
-            glViewport(0, 0, this.fbWidth, this.fbHeight);
+            resize = true;
         });
 
         if (maximised) {
@@ -104,7 +103,11 @@ public class Window {
     public int getFbWidth() { return fbWidth; }
     public int getFbHeight() { return fbHeight; }
     public boolean isResize() { return resize; }
-    public void setResize(boolean resize) { this.resize = resize; }
+    public void applyResize()
+    {
+        glViewport(0, 0, this.fbWidth, this.fbHeight);
+        resize = false;
+    }
     public boolean isVsync() { return vSync; }
     public void setVsync(boolean vSync) { this.vSync = vSync; }
     public String getTitle() {

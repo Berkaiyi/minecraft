@@ -46,7 +46,7 @@ public class Game {
     public Window getWindow() { return window; }
 
     private void init() {
-        window = new Window("LWJGL Engine", 1920, 1080, true);
+        window = new Window("LWJGL Engine", 1280, 720, true);
         window.init();
 
         timer = new Timer();
@@ -70,6 +70,7 @@ public class Game {
             accumulator += delta;
 
             window.pollEvents();
+            window.applyResize();
 
             // INPUT -----------
             //if (input.isActionDown(Action.EXIT)) {

@@ -41,7 +41,6 @@ public class MainMenuScreen implements Screen {
     @Override
     public void handleInput(Input input) {
         if (game.getWindow().isResize()) {
-            game.getWindow().setResize(false);
             calculateLayout();
         }
 
