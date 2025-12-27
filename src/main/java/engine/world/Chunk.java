@@ -25,8 +25,8 @@ public class Chunk {
 
     public void setBlock(int x, int y, int z, BlockType type) {
         BlockType oldType = blocks[x][y][z].getType();
-        Log.debug("Chunk", "setBlock local=(%d,%d,%d) %s -> %s (chunk=%s)",
-                x,y,z, oldType, type, pos);
+        //Log.debug("Chunk", "setBlock local=(%d,%d,%d) %s -> %s (chunk=%s)",
+        //        x,y,z, oldType, type, pos);
         blocks[x][y][z].setType(type);
     }
 

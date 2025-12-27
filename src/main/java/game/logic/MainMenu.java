@@ -40,7 +40,6 @@ public class MainMenu implements ScreenLogic {
         if (input.isActionPressed(Action.ATTACK_DESTROY)) {
             float mx = (float) input.getMouseXFb();
             float my = (float) input.getMouseYFb();
-            System.out.println(mx + " " + my);
 
             if (startButton.contains(mx, my)) {
                 Log.info("MainMenu", "Start clicked (mx=%.1f my=%.1f)", mx, my);

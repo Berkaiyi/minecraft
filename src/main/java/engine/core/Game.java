@@ -56,7 +56,7 @@ public class Game {
     public Window getWindow() { return window; }
 
     private void init() {
-        window = new Window("LWJGL Engine", 1920, 1080, true);
+        window = new Window("LWJGL Engine", 1920, 1080, false);
         window.init();
         Log.info("Game", "Window init done: fb=%dx%d title=%s",
                 window.getFbWidth(), window.getFbHeight(), window.getTitle());
@@ -104,7 +104,7 @@ public class Game {
             fps++;
 
             if (timer.hasSecondPassed(delta)) {
-                Log.info("Perf", "FPS=%d UPS=%d", fps, ups);
+                Log.debug("Perf", "FPS=%d UPS=%d", fps, ups);
                 fps = 0;
                 ups = 0;
             }
