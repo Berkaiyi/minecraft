@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChunkMeshBuilder {
-    public static ChunkMesh build(Chunk chunk, TextureAtlas atlas) {
+    public static ChunkMesh build(World world, Chunk chunk, TextureAtlas atlas) {
         long t0 = System.nanoTime();
         Log.debug("Mesher", "build chunk=%s", chunk.getPos());
 
@@ -23,7 +23,7 @@ public class ChunkMeshBuilder {
                     if (!block.isSolid()) { continue; }
 
                     for (Face face : Face.values()) {
-                        if (isFaceVisible(chunk, x, y, z, face)) {
+                        if (isFaceVisible(world, chunk, x, y, z, face)) {
                             addFace(vertices, indices, x, y, z, face, indexOffset, block.getType(), atlas);
                             indexOffset += 4;
                         }
@@ -84,17 +84,25 @@ public class ChunkMeshBuilder {
         indices.add(indexOffset);
     }
 
-    private static boolean isFaceVisible(Chunk c, int x, int y, int z, Face f) {
+    private static boolean isFaceVisible(World world, Chunk chunk, int x, int y, int z, Face f) {
         int nx = x + f.nx;
         int ny = y + f.ny;
         int nz = z + f.nz;
 
-        if (nx < 0 || nx >= Chunk.SIZE_X ||
-            ny < 0 || ny >= Chunk.SIZE_Y ||
-            nz < 0 || nz >= Chunk.SIZE_Z) {
-            return true;
+        if (nx >= 0 && nx < Chunk.SIZE_X &&
+            ny >= 0 && ny < Chunk.SIZE_Y &&
+            nz >= 0 && nz < Chunk.SIZE_Z) {
+            return !chunk.getBlock(nx, ny, nz).isSolid();
         }
 
-        return !c.getBlock(nx, ny, nz).isSolid();
+        int wx0 = chunk.getPos().x() * Chunk.SIZE_X + x;
+        int wz0 = chunk.getPos().z() * Chunk.SIZE_Z + z;
+
+        int wxN = wx0 + f.nx;
+        int wyN = y + f.ny;
+        int wzN = wz0 + f.nz;
+
+        BlockType neighbor = world.getBlockType(wxN, wyN, wzN);
+        return !neighbor.isSolid();
     }
 }

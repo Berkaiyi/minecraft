@@ -13,6 +13,9 @@ import engine.render.Renderer;
 import engine.render.ShaderProgram;
 import engine.scene.Camera;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class VoxelGame implements ScreenLogic {
     private Renderer renderer;
     private ShaderProgram shader;
@@ -23,6 +26,10 @@ public class VoxelGame implements ScreenLogic {
     private TextureAtlas atlas;
 
     private Matrix4f projection;
+
+    private World world;
+    private final Map<ChunkPos, ChunkMesh> chunkMeshes = new HashMap<>();
+    private final Map<ChunkPos, Matrix4f> chunkModels = new HashMap<>();
 
     private static final float MOUSE_SENS = 0.1f;
     private static final float MOVE_SPEED = 4.0f;
@@ -39,21 +46,33 @@ public class VoxelGame implements ScreenLogic {
         projection = new Matrix4f().perspective((float) Math.toRadians(70f), 1280f / 720f, 0.1f, 100f);
         Log.debug("VoxelGame", "Projection: fov=70 aspect=%.3f", 1280f / 720f);
 
-        Chunk chunk = new Chunk(new ChunkPos(0, 0));
-        Log.info("VoxelGame", "Created chunk at %s", chunk.getPos());
 
-        for (int x = 0; x < Chunk.SIZE_X; x++) {
-            for (int z = 0; z < Chunk.SIZE_Z; z++) {
-                chunk.setBlock(x, 0, z, BlockType.GRASS);
+        world = new World();
+
+        int radius = 1;
+        for (int cz = -radius; cz <= radius; cz++) {
+            for (int cx = -radius; cx <= radius; cx++) {
+
+                ChunkPos pos = new ChunkPos(cx, cz);
+                Chunk chunk = new Chunk(pos);
+
+                for (int x = 0; x < Chunk.SIZE_X; x++) {
+                    for (int z = 0; z < Chunk.SIZE_Z; z++) {
+                        chunk.setBlock(x, 0, z, BlockType.GRASS);
+                    }
+                }
+
+                int px = (cx + 10) % 16;
+                int pz = (cz + 10) % 16;
+                chunk.setBlock(px, 1, pz, BlockType.STONE);
+                chunk.setBlock(px, 2, pz, BlockType.STONE);
+
+                world.putChunk(chunk);
+                Log.info("World", "Created chunk at %s", pos);
             }
         }
 
-        chunk.setBlock(5, 1, 0, BlockType.DIRT);
-        chunk.setBlock(5, 1, 1, BlockType.STONE);
-        chunk.setBlock(5, 2, 2, BlockType.STONE);
-
-        chunkMesh = ChunkMeshBuilder.build(chunk, atlas);
-        Log.info("VoxelGame", "Chunk mesh built");
+        rebuildAllChunkMeshes();
     }
 
     @Override
@@ -94,13 +113,23 @@ public class VoxelGame implements ScreenLogic {
         float dy = (float) input.consumeMouseDeltaY();
 
         camera.addYawPitch(dx * MOUSE_SENS, -dy * MOUSE_SENS);
-        renderer.render(chunkMesh.getMesh(), shader, new Matrix4f(), camera.getViewMatrix(), projection);
+
+        Matrix4f view = camera.getViewMatrix();
+        for (var entry : chunkMeshes.entrySet()) {
+            ChunkPos pos = entry.getKey();
+            ChunkMesh mesh = entry.getValue();
+            Matrix4f model = chunkModels.get(pos);
+
+            renderer.render(mesh.getMesh(), shader, model, view, projection);
+        }
     }
 
     @Override
     public void cleanup() {
         Log.info("VoxelGame", "cleanup()");
-        if (chunkMesh != null) { chunkMesh.cleanup(); }
+        for (ChunkMesh m : chunkMeshes.values()) { m.cleanup(); }
+        chunkMeshes.clear();
+        chunkModels.clear();
         if (shader != null) { shader.cleanup(); }
         if (atlasTexture != null) { atlasTexture.cleanup(); }
     }
@@ -110,6 +139,31 @@ public class VoxelGame implements ScreenLogic {
         int h = game.getWindow().getFbHeight();
         float aspect = (h == 0) ? 1f : (float) w / (float) h;
 
-        projection = new Matrix4f().perspective((float) Math.toRadians(70f), aspect, 0.1f, 100f);
+        projection.identity().perspective((float) Math.toRadians(70f), aspect, 0.1f, 100f);
+    }
+
+    private void rebuildAllChunkMeshes() {
+        for (ChunkMesh m : chunkMeshes.values()) {
+            m.cleanup();
+        }
+        chunkMeshes.clear();
+        chunkModels.clear();
+
+        for (var entry : world.getChunks().entrySet()) {
+            ChunkPos pos = entry.getKey();
+            Chunk chunk = entry.getValue();
+
+            ChunkMesh mesh = ChunkMeshBuilder.build(world, chunk, atlas);
+            chunkMeshes.put(pos, mesh);
+
+            Matrix4f model = new Matrix4f().translation(
+                    pos.x() * Chunk.SIZE_X,
+                    0,
+                    pos.z() * Chunk.SIZE_Z
+            );
+            chunkModels.put(pos, model);
+        }
+
+        Log.info("VoxelGame", "Rebuilt meshes: %d chunks", chunkMeshes.size());
     }
 }
