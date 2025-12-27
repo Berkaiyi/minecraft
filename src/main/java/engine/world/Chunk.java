@@ -1,5 +1,7 @@
 package engine.world;
 
+import engine.util.Log;
+
 public class Chunk {
     public static final int SIZE_X = 16;
     public static final int SIZE_Y = 256;
@@ -9,6 +11,7 @@ public class Chunk {
     private final Block[][][] blocks;
 
     public Chunk(ChunkPos pos) {
+        Log.debug("Chunk", "new Chunk pos=%s", pos);
         this.pos = pos;
         this.blocks = new Block[SIZE_X][SIZE_Y][SIZE_Z];
         initEmpty();
@@ -21,6 +24,9 @@ public class Chunk {
     }
 
     public void setBlock(int x, int y, int z, BlockType type) {
+        BlockType oldType = blocks[x][y][z].getType();
+        Log.debug("Chunk", "setBlock local=(%d,%d,%d) %s -> %s (chunk=%s)",
+                x,y,z, oldType, type, pos);
         blocks[x][y][z].setType(type);
     }
 

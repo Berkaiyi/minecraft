@@ -8,5 +8,5 @@ public enum Action {
     MOVE_UP,
     MOVE_DOWN,
     EXIT,
-    LEFT_CLICK
+    ATTACK_DESTROY
 }

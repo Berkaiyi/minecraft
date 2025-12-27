@@ -1,14 +1,13 @@
 package game.logic;
 
 import engine.core.Game;
-import engine.core.GameLogic;
 import engine.input.Action;
 import engine.input.Input;
 import engine.render.Texture;
 import engine.render.TextureAtlas;
+import engine.util.Log;
 import engine.world.*;
 import game.screens.MainMenuScreen;
-import launcher.Main;
 import org.joml.Matrix4f;
 import engine.render.Renderer;
 import engine.render.ShaderProgram;
@@ -26,20 +25,22 @@ public class VoxelGame implements ScreenLogic {
     private Matrix4f projection;
 
     private static final float MOUSE_SENS = 0.1f;
-    private static final float MOVE_SPEED = 3.0f;
+    private static final float MOVE_SPEED = 4.0f;
 
     @Override
     public void init(Game game) {
         renderer = new Renderer();
         shader = new ShaderProgram("/shaders/atlas.vert", "/shaders/atlas.frag");
-
         atlasTexture = new Texture("/textures/atlas.png");
         atlas = new TextureAtlas(16, 16);
+        Log.info("VoxelGame", "Loaded shader atlas + texture atlas.png");
 
         camera = new Camera();
         projection = new Matrix4f().perspective((float) Math.toRadians(70f), 1280f / 720f, 0.1f, 100f);
+        Log.debug("VoxelGame", "Projection: fov=70 aspect=%.3f", 1280f / 720f);
 
         Chunk chunk = new Chunk(new ChunkPos(0, 0));
+        Log.info("VoxelGame", "Created chunk at %s", chunk.getPos());
 
         for (int x = 0; x < Chunk.SIZE_X; x++) {
             for (int z = 0; z < Chunk.SIZE_Z; z++) {
@@ -52,6 +53,7 @@ public class VoxelGame implements ScreenLogic {
         chunk.setBlock(5, 2, 2, BlockType.STONE);
 
         chunkMesh = ChunkMeshBuilder.build(chunk, atlas);
+        Log.info("VoxelGame", "Chunk mesh built");
     }
 
     @Override
@@ -62,6 +64,7 @@ public class VoxelGame implements ScreenLogic {
     @Override
     public void handleInput(Game game, Input input) {
         if (input.isActionDown(Action.EXIT)) {
+            Log.info("VoxelGame", "EXIT pressed -> MainMenuScreen");
             game.setScreen(new MainMenuScreen(game));
         }
     }
@@ -96,6 +99,7 @@ public class VoxelGame implements ScreenLogic {
 
     @Override
     public void cleanup() {
+        Log.info("VoxelGame", "cleanup()");
         if (chunkMesh != null) { chunkMesh.cleanup(); }
         if (shader != null) { shader.cleanup(); }
         if (atlasTexture != null) { atlasTexture.cleanup(); }

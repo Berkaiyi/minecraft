@@ -1,5 +1,6 @@
 package engine.input;
 
+import engine.util.Log;
 import engine.window.Window;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
@@ -19,9 +20,9 @@ public class Input {
     private final Map<Integer, KeyState> mouseButtons = new HashMap<>();
     private final Set<Integer> mousePressedEvents = new HashSet<>(); // TODO: press+release can happen simultaneously
 
-    private GLFWCursorPosCallback cursorCallback;
-    private GLFWKeyCallback keyCallback;
-    private GLFWMouseButtonCallback mouseButtonCallback;
+    private final GLFWCursorPosCallback cursorCallback;
+    private final GLFWKeyCallback keyCallback;
+    private final GLFWMouseButtonCallback mouseButtonCallback;
 
     private double mouseX, mouseY;
     private double lastMouseX, lastMouseY;
@@ -81,16 +82,18 @@ public class Input {
     public void bindKey(Action action, int glfwKey) {
         bindings.put(action, glfwKey);
         registerKey(glfwKey);
+        Log.debug("Input", "bindKey: %s -> %d", action, glfwKey);
     }
     public void bindButton(Action action, int glfwButton) {
         bindings.put(action, glfwButton);
         registerMouseButton(glfwButton);
+        Log.debug("Input", "bindButton: %s -> %d", action, glfwButton);
     }
 
     public boolean isActionPressed(Action action) {
         Integer key = bindings.get(action);
         if (key == null) {
-            System.out.println("Action: " + action + " is not bound!");
+            Log.warn("Input", "Action not bound: %s", action);
             return false;
         }
         if (keys.containsKey(key)) { return isKeyPressed(key); }
@@ -101,7 +104,7 @@ public class Input {
     public boolean isActionDown(Action action) {
         Integer key = bindings.get(action);
         if (key == null) {
-            System.out.println("Action: " + action + " is not bound!");
+            Log.warn("Input", "Action not bound: %s", action);
             return false;
         }
         if (keys.containsKey(key)) { return isKeyDown(key); }
@@ -128,12 +131,14 @@ public class Input {
     }
 
     public void resetMouse() {
+        Log.debug("Input", "resetMouse()");
         firstMouse = true;
         deltaX = 0;
         deltaY = 0;
     }
 
     public void cleanup() {
+        Log.info("Input", "cleanup callback");
         if (cursorCallback != null) { cursorCallback.free(); }
         if (keyCallback != null) { keyCallback.free(); }
         if (mouseButtonCallback != null) { mouseButtonCallback.free(); }

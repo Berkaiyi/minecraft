@@ -1,12 +1,16 @@
 package engine.world;
 
 import engine.render.TextureAtlas;
+import engine.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ChunkMeshBuilder {
     public static ChunkMesh build(Chunk chunk, TextureAtlas atlas) {
+        long t0 = System.nanoTime();
+        Log.debug("Mesher", "build chunk=%s", chunk.getPos());
+
         List<Float> vertices = new ArrayList<>();
         List<Integer> indices = new ArrayList<>();
         int indexOffset = 0;
@@ -27,6 +31,12 @@ public class ChunkMeshBuilder {
                 }
             }
         }
+
+        int vertexCount = vertices.size() / 8;
+        int triCount = indices.size() / 3;
+        double ms = (System.nanoTime() - t0) / 1_000_000.0;
+        Log.info("Mesher", "chunk=%s vertices=%d tris=%d time=%.2fms",
+                chunk.getPos(), vertexCount, triCount, ms);
 
         return new ChunkMesh(vertices, indices);
     }

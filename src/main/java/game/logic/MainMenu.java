@@ -4,16 +4,12 @@ import engine.core.Game;
 import engine.input.Action;
 import engine.input.Input;
 import engine.render.Mesh;
-import engine.render.Renderer;
 import engine.render.ShaderProgram;
-import engine.screen.Screen;
-import game.logic.MainMenu;
+import engine.util.Log;
 import game.screens.GameScreen;
 import org.joml.Matrix4f;
-import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 import static org.lwjgl.opengl.GL11.*;
 
 public class MainMenu implements ScreenLogic {
@@ -25,8 +21,7 @@ public class MainMenu implements ScreenLogic {
 
     @Override
     public void init(Game game) {
-        game.getWindow().setCursorCaptured(false);
-
+        Log.info("MainMenu", "init()");
         shader = new ShaderProgram("/shaders/menu.vert", "/shaders/menu.frag");
 
         createButtonMesh();
@@ -35,18 +30,24 @@ public class MainMenu implements ScreenLogic {
 
     @Override
     public void onResize(Game game) {
+        Log.debug("MainMenu", "resize -> recalc layout (fb=%dx%d)",
+                game.getWindow().getFbWidth(), game.getWindow().getFbHeight());
         calculateLayout(game);
     }
 
     @Override
     public void handleInput(Game game, Input input) {
-        if (input.isActionPressed(Action.LEFT_CLICK)) {
+        if (input.isActionPressed(Action.ATTACK_DESTROY)) {
             float mx = (float) input.getMouseXFb();
             float my = (float) input.getMouseYFb();
+            System.out.println(mx + " " + my);
 
             if (startButton.contains(mx, my)) {
+                Log.info("MainMenu", "Start clicked (mx=%.1f my=%.1f)", mx, my);
                 game.setScreen(new GameScreen(game));
-            } else if (quitButton.contains(mx, my)) {
+            }
+            else if (quitButton.contains(mx, my)) {
+                Log.info("MainMenu", "Quit clicked (mx=%.1f my=%.1f)", mx, my);
                 game.getWindow().close();
             }
         }
