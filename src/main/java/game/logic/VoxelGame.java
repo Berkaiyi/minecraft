@@ -43,9 +43,12 @@ public class VoxelGame implements ScreenLogic {
         Log.info("VoxelGame", "Loaded shader atlas + texture atlas.png");
 
         camera = new Camera();
-        projection = new Matrix4f().perspective((float) Math.toRadians(70f), 1280f / 720f, 0.1f, 100f);
-        Log.debug("VoxelGame", "Projection: fov=70 aspect=%.3f", 1280f / 720f);
 
+        int w = game.getWindow().getFbWidth();
+        int h = game.getWindow().getFbHeight();
+        float aspect = (float) w / (float) h;
+        projection = new Matrix4f().perspective((float) Math.toRadians(70f), aspect, 0.1f, 100f);
+        Log.debug("VoxelGame", "Projection: fov=70 aspect=%.3f", aspect);
 
         world = new World();
 
